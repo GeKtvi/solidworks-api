@@ -43,6 +43,9 @@ namespace CADBooster.SolidDna
         /// Called when a SolidWorks callback is fired
         /// </summary>
         public static event Action<string> CallbackFired = (name) => { };
+        
+        public static event Action<EnableMethodArgs> EnableMethodFired = (name) => { };
+
 
         #endregion
 
@@ -121,6 +124,25 @@ namespace CADBooster.SolidDna
 
                 // Log it
                 Logger.LogCriticalSource($"OnCallback failed. {ex.GetErrorMessage()}");
+            }
+        }        
+        
+        public int OnEnableMethod(string name)
+        {
+            try
+            {
+                var args = new EnableMethodArgs(name); 
+                // Inform listeners
+                EnableMethodFired(args);
+                return args.Result;
+            }
+            catch (Exception ex)
+            {
+                Debugger.Break();
+
+                // Log it
+                Logger.LogCriticalSource($"OnCallback failed. {ex.GetErrorMessage()}");
+                return 1;
             }
         }
 

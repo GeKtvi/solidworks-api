@@ -105,6 +105,9 @@ namespace CADBooster.SolidDna
 
             // Listen out for callbacks
             PlugInIntegration.CallbackFired += PlugInIntegration_CallbackFired;
+
+            // Listen out for EnableMethod callbacks
+            PlugInIntegration.EnableMethodFired += PlugInIntegration_EnableMethodFired;
         }
 
         /// <summary>
@@ -372,6 +375,16 @@ namespace CADBooster.SolidDna
 
             // Call the action
             item?.OnClick?.Invoke();
+        }
+
+        private void PlugInIntegration_EnableMethodFired(EnableMethodArgs args)
+        {
+            // Find the item, if any
+            var item = Items.FirstOrDefault(f => f.CallbackId == args.Name);
+
+            // Call the action
+            if(item is CommandManagerItem managerItem)
+                managerItem.OnEnableStateCheck?.Invoke(args);
         }
 
         /// <summary>

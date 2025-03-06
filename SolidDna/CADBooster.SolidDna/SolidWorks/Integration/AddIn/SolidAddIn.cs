@@ -127,6 +127,14 @@ namespace CADBooster.SolidDna
             PlugInIntegration.OnCallback(arg);
         }
 
+        public int EnableMethod(string arg)
+        {
+            // Log it
+            Logger.LogDebugSource($"SolidWorks Callback fired {arg}");
+
+            return PlugInIntegration.OnEnableMethod(arg);
+        }
+
         /// <summary>
         /// Called when SolidWorks has loaded our add-in and wants us to do our connection logic
         /// </summary>

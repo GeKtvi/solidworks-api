@@ -525,11 +525,7 @@ namespace CADBooster.SolidDna
             return SolidDnaErrors.Wrap(() =>
             {
                 // Create the new file
-                var swModel = UnsafeObject.INewDocument2(templatePath, (int)paperSize, width, height);
-
-                // If the modelDoc is null, creating a new file failed
-                if (swModel == null)
-                    throw new Exception("Failed to create a new file");
+                var swModel = UnsafeObject.INewDocument2(templatePath, (int)paperSize, width, height) ?? throw new Exception("Failed to create a new file");
 
                 // If we have a value, we wrap it in a Model
                 return new Model(swModel);
@@ -581,12 +577,7 @@ namespace CADBooster.SolidDna
                 var warnings = 0;
 
                 // Attempt to open the document
-                var swModel = BaseObject.OpenDoc6(filePath, (int)fileType, (int)options, configuration, ref errors, ref warnings);
-
-                // TODO: Read errors into enums for better reporting
-                // For now just check if model is not null
-                if (swModel == null)
-                    throw new Exception($"Failed to open file. Errors {errors}, Warnings {warnings}");
+                var swModel = BaseObject.OpenDoc6(filePath, (int)fileType, (int)options, configuration, ref errors, ref warnings) ?? throw new Exception($"Failed to open file. Errors {errors}, Warnings {warnings}");
 
                 // Return new model
                 return new Model(swModel);
@@ -609,12 +600,8 @@ namespace CADBooster.SolidDna
             return SolidDnaErrors.Wrap(() =>
                 {
                     // Attempt to open the document
-                    var swModel = BaseObject.OpenDoc7(documentSpecification);
-
-                    // TODO: Read errors into enums for better reporting
-                    // For now just check if model is not null
-                    if (swModel == null)
-                        throw new Exception($"Failed to open file. Errors {documentSpecification.Error}, Warnings {documentSpecification.Warning}");
+                    var swModel = BaseObject.OpenDoc7(documentSpecification) 
+                        ?? throw new Exception($"Failed to open file. Errors {documentSpecification.Error}, Warnings {documentSpecification.Warning}");
 
                     // Return new model
                     return new Model(swModel);
