@@ -1,9 +1,12 @@
 ﻿using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -218,6 +221,9 @@ namespace CADBooster.SolidDna
             // Wrap any error
             SolidDnaErrors.Wrap(() =>
             {
+                Logger.LogTraceSource($"OnIdleNotify Active: {BaseObject?.IActiveDoc2?.GetPathName()}");
+                Logger.LogTraceSource($"OnIdleNotify Active Wrapper: {ActiveModel?.FilePath}");
+                DisposeClosingModels();
                 // Inform listeners
                 Idle();
             },
@@ -317,6 +323,7 @@ namespace CADBooster.SolidDna
             {
                 // View Only mode (Large Assembly Review and Quick View) does not fire the FileOpenPostNotify event, so we catch these models here.
                 var activeDoc = BaseObject.IActiveDoc2;
+                Logger.LogTraceSource($"ActiveModelChanged called: {activeDoc?.GetPathName()}");
                 if (activeDoc != null)
                 {
                     var loadingInViewOnlyMode = activeDoc.IsOpenedViewOnly();
@@ -357,10 +364,30 @@ namespace CADBooster.SolidDna
         private void ReloadActiveModelInformation()
         {
             // First clean-up any previous SW data
-            CleanActiveModelData();
+            //CleanActiveModelData();
+
+            if (mActiveModel != null)
+            {
+                mActiveModel.ModelSaved -= ActiveModel_Saved;
+                mActiveModel.ModelInformationChanged -= ActiveModel_InformationChanged;
+                mActiveModel.ModelClosing -= ActiveModel_Closing;
+                if(mActiveModel.UnsafeObject != null)
+                    _activeModelsCache.Put(mActiveModel);
+            }
+
+            mActiveModel = null;
 
             // Now get the new data
-            mActiveModel = BaseObject.IActiveDoc2 == null || BaseObject.GetDocumentCount() == 0 ? null : new Model(BaseObject.IActiveDoc2);
+            var unsafeModel = BaseObject.IActiveDoc2;
+            if (unsafeModel == null || BaseObject.GetDocumentCount() == 0)
+            {
+                ActiveModelInformationChanged(mActiveModel);
+                return;
+            }
+
+            mActiveModel = _activeModelsCache.TryTake(unsafeModel.GetPathName(), out var model) 
+                ? model 
+                : new Model(unsafeModel);
 
             // Listen out for events
             if (mActiveModel != null)
@@ -394,11 +421,84 @@ namespace CADBooster.SolidDna
             ActiveModelInformationChanged(mActiveModel);
         }
 
+        //private Dictionary<string, Model> _cachedActiveModels = new Dictionary<string, Model>();
+        private Model _closingModel;
+        private readonly ModelCache _activeModelsCache = new ModelCache();
+
+        private class ModelCache
+        {
+            public Model ClosingModel { get; private set; }
+
+            private class ClosingEventClosure : IDisposable
+            {
+                public Model Model { get; }
+                private readonly Action<ClosingEventClosure> _onReleased;
+
+                public ClosingEventClosure(Model model, Action<ClosingEventClosure> onReleased)
+                {
+                    Model = model;
+                    _onReleased = onReleased;
+                    model.ModelClosing += OnModelClosing;
+                }
+
+                private void OnModelClosing()
+                {
+                    _onReleased.Invoke(this);
+                }
+
+                public void Dispose() => Model.ModelClosing -= OnModelClosing;
+            }
+
+            private readonly Dictionary<string, ClosingEventClosure> _models = new Dictionary<string, ClosingEventClosure>();
+
+            public bool TryTake(string namePath, out Model model)
+            {
+                var ret = _models.TryGetValue(namePath, out var eventClosure);
+
+                if (!ret)
+                {
+                    model = null;
+                    return false;
+                }
+
+                eventClosure.Dispose();
+                model = eventClosure.Model;
+                _models.Remove(model.FilePath);
+
+                return ret;
+            }
+
+            public void Put(Model model)
+                => _models[model.FilePath] = new ClosingEventClosure(model, x => ClosingModel = x.Model);
+
+            public void FinalizeClosingModel()
+            {
+                ClosingModel?.Dispose();
+                ClosingModel = null;
+            }
+        }
+
+        private void DisposeClosingModels()
+        {
+            if(_closingModel != null)
+            {
+                ReloadActiveModelInformation();
+                _closingModel.Dispose();
+                _closingModel = null;
+            }
+
+            _activeModelsCache.FinalizeClosingModel();
+        }
+
         /// <summary>
         /// Called when the active document is closed
         /// </summary>
         private void ActiveModel_Closing()
         {
+            Logger.LogTraceSource($"ActiveModel_Closing Active: {BaseObject?.IActiveDoc2?.GetPathName()}");
+
+            if (ActiveModel != null)
+                _closingModel = ActiveModel;
             // 
             // NOTE: There is no event to detect when all documents are closed 
             // 
@@ -414,27 +514,27 @@ namespace CADBooster.SolidDna
             //       in that case anyway
             //
 
-            // Check for every file if it may have been the last one.
-            Task.Run(async () =>
-            {
-                // Wait for it to close
-                await Task.Delay(200);
+            //// Check for every file if it may have been the last one.
+            //Task.Run(async () =>
+            //{
+            //    // Wait for it to close
+            //    await Task.Delay(200);
 
-                // Lock to prevent Disposing to change while this section is running.
-                lock (mDisposingLock)
-                {
-                    if (Disposing)
-                        // If we are disposing SolidWorks, there is no need to reload active model info.
-                        return;
+            //    // Lock to prevent Disposing to change while this section is running.
+            //    lock (mDisposingLock)
+            //    {
+            //        if (Disposing)
+            //            // If we are disposing SolidWorks, there is no need to reload active model info.
+            //            return;
 
-                    // Now if we have none open, reload information
-                    // ActiveDoc is quickly set to null after the last document is closed
-                    // GetDocumentCount takes longer to go to zero for big assemblies, but it might be a more reliable indicator.
-                    if (BaseObject?.ActiveDoc == null || BaseObject?.GetDocumentCount() == 0)
-                        ReloadActiveModelInformation();
+            //        // Now if we have none open, reload information
+            //        // ActiveDoc is quickly set to null after the last document is closed
+            //        // GetDocumentCount takes longer to go to zero for big assemblies, but it might be a more reliable indicator.
+            //        //if (BaseObject?.ActiveDoc == null || BaseObject?.GetDocumentCount() == 0)
+            //        //    ReloadActiveModelInformation();
 
-                }
-            });
+            //    }
+            //});
         }
 
         /// <summary>
@@ -581,12 +681,8 @@ namespace CADBooster.SolidDna
                 var warnings = 0;
 
                 // Attempt to open the document
-                var swModel = BaseObject.OpenDoc6(filePath, (int)fileType, (int)options, configuration, ref errors, ref warnings);
-
-                // TODO: Read errors into enums for better reporting
-                // For now just check if model is not null
-                if (swModel == null)
-                    throw new Exception($"Failed to open file. Errors {errors}, Warnings {warnings}");
+                var swModel = BaseObject.OpenDoc6(filePath, (int)fileType, (int)options, configuration, ref errors, ref warnings) 
+                    ?? throw new Exception($"Failed to open file. Errors {errors}, Warnings {warnings}");
 
                 // Return new model
                 return new Model(swModel);
