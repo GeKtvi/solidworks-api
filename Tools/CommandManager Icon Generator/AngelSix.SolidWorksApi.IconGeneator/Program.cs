@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Svg;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -8,6 +9,11 @@ namespace AngelSix.SolidWorksApi.IconGeneator
 {
     class Program
     {
+        private const string s_ScaleImagesModeArgument = "/ScaleImages";
+        private const string s_ContactBitmapsModeArgument = "/ContactBitmaps";
+        private const string s_FileNamePrepend = "/FileNamePrepend";
+        private static readonly List<int> s_possibleSizes = [20, 32, 40, 64, 96, 128];
+
         /// <summary>
         /// Drag and drop images onto the exe to generate SolidWorks toolbar sprites 
         /// or open by double clicking to interactively select files and an output name
@@ -24,28 +30,74 @@ namespace AngelSix.SolidWorksApi.IconGeneator
             Console.WriteLine("----------------------------------------");
             Console.WriteLine("");
 
+            var paths = args.Select(x => x.Trim('"')).ToList();
+
+            // Extract FileNamePrepend
+            if (paths.Contains(s_FileNamePrepend))
+            {
+                var index = paths.IndexOf(s_FileNamePrepend);
+                // Remove argument name
+                paths.RemoveAt(index);
+                filenamePrepend = paths[index];
+                // Remove argument value
+                paths.RemoveAt(index);
+            }
+
+            _ = paths.Remove(s_ScaleImagesModeArgument);
+            _ = paths.Remove(s_ContactBitmapsModeArgument);
+
+            if (args.Contains(s_ScaleImagesModeArgument))
+            {
+                ScaleImages(paths.ToArray(), filenamePrepend);
+                return;
+            }
+            if (args.Contains(s_ContactBitmapsModeArgument))
+            {
+                ContactBitmaps(paths.ToArray(), filenamePrepend);
+                return;
+            }
+
             // 
             //   NOTE: 
             //
-            //   We expect a list of images in, and a name to prepend the filename as the last argument
+            //   We expect a list of images or path patterns in, and a name to prepend the filename as the last argument
             //
             //   From that we will combine them into lists and resize them 
             //   from the top size down to the smallest size
             //
+            Console.WriteLine($"Entering icon generation mode.");
+            Console.WriteLine($"Press 1 for ScaleImages mode (High-resolution images to batch of downscaled images)");
+            Console.WriteLine($"Press 2 for ContactBitmaps mode (Pack of correctly sized images to batch of same-sized images)");
+            var mode = Console.ReadKey().Key;
+            Console.WriteLine();
+            if (mode == ConsoleKey.D1 || mode == ConsoleKey.NumPad1)
+            {
+                // All output sizes
+                ScaleImages(paths.ToArray(), filenamePrepend);
+            }
+            else if (mode == ConsoleKey.D2 || mode == ConsoleKey.NumPad2)
+            {
+                ContactBitmaps(paths.ToArray(), filenamePrepend);
+            }
+            else
+            {
+                Console.WriteLine("Unsupported mode selected.");
+            }
+        }
 
-            // All output sizes
-            var possibleSizes = new List<int>(new[] { 20, 32, 40, 64, 96, 128 });
+        private static void ScaleImages(string[] args, string filenamePrepend)
+        {
 
             // Add any command line args
-            var images = new List<string>();
+            var images = new List<FileInfo>();
             if (args?.Length > 0)
-                images.AddRange(args);
+                images.AddRange(args.Select(x => new FileInfo(x)));
 
             // If we have no images then simply ask the user to start specifying the image paths
             if (images.Count < 1)
             {
                 // Wipe any previous data
-                images = new List<string>();
+                images = [];
 
                 // Start asking user to enter image paths
                 var result = " ";
@@ -76,27 +128,30 @@ namespace AngelSix.SolidWorksApi.IconGeneator
                         else
                         {
                             // Add this to the list and carry on
-                            images.Add(result);
+                            images.Add(new(result));
                         }
                     }
                     else
                     {
                         // Add this to the list and carry on
-                        images.Add(result);
+                        images.Add(new(result));
                     }
                 }
 
-                // Get filename to append
-                Console.ResetColor();
-                Console.WriteLine("Enter the name to prepend to the output files");
-                filenamePrepend = Console.ReadLine();
+                filenamePrepend = GetFileNamePrepend();
+            }
+
+            if (images.Count == 0)
+            {
+                Console.WriteLine("Specify at least one image pattern");
+                return;
             }
 
             // Now create an image from each of the images, for each file size
-            possibleSizes.ForEach(size =>
+            s_possibleSizes.ForEach(size =>
             {
                 // Check all files exist
-                if (images.Any(image => !File.Exists(image)))
+                if (images.Any(image => !image.Exists))
                 {
                     Console.WriteLine("One or more of the files do not exist. Press enter to exit");
                     Console.ReadLine();
@@ -104,13 +159,105 @@ namespace AngelSix.SolidWorksApi.IconGeneator
                 }
 
                 // Combine all bitmaps
-                using (var combinedImage = CombineBitmap(images, size))
+                using var combinedImage = CombineBitmap(images, size);
+                if (combinedImage == null)
+                    return;
+                combinedImage.Save($"{filenamePrepend}{size}.png");
+            });
+        }
+
+        private static string GetFileNamePrepend()
+        {
+            string filenamePrepend;
+            // Get filename to append
+            Console.ResetColor();
+            Console.WriteLine("Enter the name to prepend to the output files");
+            filenamePrepend = Console.ReadLine();
+            return filenamePrepend;
+        }
+
+        class MultiSizeImage
+        {
+            public FileInfo[] Sizes { get; set; } = [];
+        }
+
+        private static void ContactBitmaps(string[] args, string filenamePrepend)
+        {
+            var images = new List<MultiSizeImage>();
+
+            var patterns = args.Length == 0 ? GetPatternsFromInput() : args;
+
+            foreach (var imagePattern in patterns)
+            {
+                var files = new List<FileInfo>();
+                foreach (var size in s_possibleSizes)
+                {
+                    var fileName = string.Format(imagePattern, size);
+
+                    if (File.Exists(fileName) == false)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Image not found");
+                        throw new FileNotFoundException();
+                    }
+
+                    files.Add(new FileInfo(fileName));
+                }
+                images.Add(new MultiSizeImage() { Sizes = files.ToArray() });
+            }
+
+            if(images.Count == 0)
+            {
+                Console.WriteLine("Specify at least one pattern");
+                return;
+            }
+
+            filenamePrepend = GetFileNamePrepend();
+
+            var index = 0;
+            foreach (var size in s_possibleSizes)
+            {
+                var indexedImages = images.Select(x => x.Sizes[index]);
+
+                // Combine all bitmaps
+                using (var combinedImage = CombineBitmap(indexedImages.ToList(), size))
                 {
                     if (combinedImage == null)
                         return;
                     combinedImage.Save($"{filenamePrepend}{size}.png");
                 }
-            });
+                index++;
+            }
+        }
+
+        private static IEnumerable<string> GetPatternsFromInput()
+        {
+            var count = 0;
+            foreach (var item in s_possibleSizes)
+            {
+                Console.WriteLine($"Enter the pattern to the {NthNumber(count + 1)}. Once done press enter");
+                while (true)
+                {
+                    var pattern = Console.ReadLine();
+
+                    if (string.IsNullOrEmpty(pattern))
+                        yield break;
+
+                    if (pattern.Contains("{0}") == false)
+                    {
+                        Console.WriteLine(@"Pattern must contain ""{0}"" placeholder.");
+                        continue;
+                    }
+                    else
+                    {
+                        yield return pattern;
+                        break;
+                    }
+                }
+
+
+                count++;
+            }
         }
 
         /// <summary>
@@ -123,17 +270,13 @@ namespace AngelSix.SolidWorksApi.IconGeneator
             // Base10 the number
             number %= 10;
 
-            switch (number)
+            return number switch
             {
-                case 1:
-                    return $"{number}st";
-                case 2:
-                    return $"{number}nd";
-                case 3:
-                    return $"{number}rd";
-                default:
-                    return $"{number}th";
-            }
+                1 => $"{number}st",
+                2 => $"{number}nd",
+                3 => $"{number}rd",
+                _ => $"{number}th",
+            };
         }
 
         /// <summary>
@@ -142,7 +285,7 @@ namespace AngelSix.SolidWorksApi.IconGeneator
         /// <param name="files">The files to combine</param>
         /// <param name="iconSize">The sprite size</param>
         /// <returns></returns>
-        private static Bitmap CombineBitmap(List<string> files, int iconSize)
+        private static Bitmap CombineBitmap(List<FileInfo> files, int iconSize)
         {
             // Read all images into memory
             Bitmap finalImage = null;
@@ -168,7 +311,7 @@ namespace AngelSix.SolidWorksApi.IconGeneator
                     files.ForEach(file =>
                     {
                         // Read this image
-                        var bitmap = new Bitmap(file);
+                        var bitmap = file.Extension.ToLower() == ".svg" ? ConvertSvgToBitmap(file, iconSize) : new Bitmap(file.FullName);
                         images.Add(bitmap);
 
                         // Scale it to the sprite size
@@ -197,6 +340,14 @@ namespace AngelSix.SolidWorksApi.IconGeneator
                 // Cleanup
                 images.ForEach(image => image?.Dispose());
             }
+        }
+        private static Bitmap ConvertSvgToBitmap(FileInfo svgFile, int size)
+        {
+            // Load SVG document
+            var svgDocument = SvgDocument.Open(svgFile.FullName);
+
+            // Convert to Bitmap
+            return svgDocument.Draw(size, size);
         }
     }
 }

@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "CLI": {
+      "commandName": "Project"
+    },
+    "ARGS SVG": {
+      "commandName": "Project",
+      "commandLineArgs": "list.svg listUpdate.svg /ScaleImages /FileNamePrepend svgIcon_"
+    }
+  }
+}
