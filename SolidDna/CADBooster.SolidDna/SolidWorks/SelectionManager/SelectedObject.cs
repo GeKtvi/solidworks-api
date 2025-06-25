@@ -18,7 +18,7 @@ namespace CADBooster.SolidDna
         /// <summary>
         /// The type of the selected object
         /// </summary>
-        public swSelectType_e ObjectType { get; set; }
+        public swSelectType_e ObjectType { get; private set; }
 
         #region Type Checks
 
@@ -61,7 +61,12 @@ namespace CADBooster.SolidDna
         /// </summary>
         public SelectedObject(object model) : base(model)
         {
-            
+
+        }
+
+        public SelectedObject(object model, swSelectType_e objectType) : base(model)
+        {
+            ObjectType = objectType;
         }
 
         #endregion
@@ -73,6 +78,7 @@ namespace CADBooster.SolidDna
         /// Check with <see cref="IsFeature"/> first to assure that it is this type
         /// </summary>
         /// <param name="action">The feature is passed into this action to be used within it</param>
+        [Obsolete("Use AsFeature extension")]
         public void AsFeature(Action<ModelFeature> action)
         {
             // Wrap any error
@@ -94,6 +100,7 @@ namespace CADBooster.SolidDna
         /// Check with <see cref="IsDimension"/> first to assure that it is this type
         /// </summary>
         /// <param name="action">The Dimension is passed into this action to be used within it</param>
+        [Obsolete("Use AsDimension extension")]
         public void AsDimension(Action<ModelDisplayDimension> action)
         {
             // Wrap any error
