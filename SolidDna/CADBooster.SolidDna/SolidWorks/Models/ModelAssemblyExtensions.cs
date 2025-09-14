@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CADBooster.SolidDna.SolidWorks.Models
+namespace CADBooster.SolidDna
 {
     public class ComponentNode
     {

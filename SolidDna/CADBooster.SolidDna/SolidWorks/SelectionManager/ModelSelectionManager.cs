@@ -197,6 +197,18 @@ namespace CADBooster.SolidDna
             => SelectObjects(Enumerable.Repeat(selectedObject, 1), selectionData, updateUserInterface);
 
         /// <summary>
+        /// Selects a single object with specified selection data
+        /// </summary>
+        /// <param name="selectedObject">The object to select</param>
+        /// <param name="updateUserInterface">Whether to update the UI after selection</param>
+        /// <remarks>
+        /// To use <see cref="SolidDnaObject"/>s with the selection manager, wrap them using:
+        /// <see cref="SelectedObjectExtensions.AsSelectedObject(SolidDnaObject)"/>.
+        /// </remarks>
+        public void SelectObject(SelectedObject selectedObject, bool updateUserInterface = true)
+            => SelectObjects(Enumerable.Repeat(selectedObject, 1), SelectionData.Default, updateUserInterface);
+
+        /// <summary>
         /// Selects an object by name and type with specified selection data
         /// </summary>
         /// <param name="name">The name of the object to select</param>
