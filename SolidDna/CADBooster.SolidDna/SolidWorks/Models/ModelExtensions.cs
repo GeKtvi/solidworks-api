@@ -169,7 +169,7 @@ namespace CADBooster.SolidDna
         /// <returns>Enumerable of wrapped child features</returns>
         public static IEnumerable<ModelFeature> EnumerateChildFeatures(this ModelFeature feature, ICompositeDisposable disposable = null)
             => feature
-                .EnumerateUnsafeParentFeatures()
+                .EnumerateUnsafeChildFeatures()
                 .WrapDnaObject(disposable.GetDummyIfNull());
 
         #endregion
