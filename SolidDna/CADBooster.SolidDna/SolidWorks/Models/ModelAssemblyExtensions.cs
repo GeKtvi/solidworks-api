@@ -1,6 +1,8 @@
 ﻿using SolidWorks.Interop.sldworks;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace CADBooster.SolidDna
 {
@@ -40,6 +42,27 @@ namespace CADBooster.SolidDna
             var component = GetRootComponentFromConfiguration(model, configurationName);
 
             return new ComponentNode(null, component, compositeDisposable ?? DummyCompositeDisposable.Default).Children;
+        }
+
+        public static IEnumerable<ComponentNode> GetComponentNodesRecursively(this Model model, bool includeRoot = false, ICompositeDisposable compositeDisposable = null)
+        {
+            var root = model.GetRootComponentNode(null, compositeDisposable);
+
+            if(includeRoot)
+                yield return root;
+
+            foreach (var child in root.GetComponentNodesRecursively(compositeDisposable))
+                yield return child;
+        }
+
+        public static IEnumerable<ComponentNode> GetComponentNodesRecursively(this ComponentNode node, ICompositeDisposable compositeDisposable = null)
+        {
+            foreach (var child in node.Children)
+            {
+                yield return child;
+                foreach (var subChild in child.GetComponentNodesRecursively(compositeDisposable))
+                    yield return subChild;
+            }
         }
 
         private static Component GetRootComponentFromConfiguration(Model model, string configurationName)
