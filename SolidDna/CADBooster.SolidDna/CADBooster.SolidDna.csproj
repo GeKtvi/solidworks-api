@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.3.0.3-gkfrk</Version>
+    <Version>3.3.0.14-gkfrk</Version>
     <AssemblyVersion>3.3.0.0</AssemblyVersion>
     <FileVersion>3.3.0.0</FileVersion>
     <Authors>Luke Malpass, Peter Brinkhuis</Authors>
