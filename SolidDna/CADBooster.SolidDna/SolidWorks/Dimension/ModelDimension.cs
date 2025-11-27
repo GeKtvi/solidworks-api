@@ -1,10 +1,16 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using SolidWorks.Interop.sldworks;
 
 namespace CADBooster.SolidDna
 {
     public class ModelDimension : SolidDnaObject<IDimension>
     {
+        #region Private Members
+
+        private readonly Lazy<ModelFeature> _featureOwner;
+
+        #endregion
         public string Name
         {
             get => BaseObject.Name;
@@ -27,7 +33,7 @@ namespace CADBooster.SolidDna
         public bool IsReference => BaseObject.IsReference();
         public bool IsAppliedToAllConfigurations => BaseObject.IsAppliedToAllConfigurations();
         public bool IsDesignTableDimension => BaseObject.IsDesignTableDimension();
-        public ModelFeature FeatureOwner => new ModelFeature(BaseObject.GetFeatureOwner());
+        public ModelFeature FeatureOwner => _featureOwner.Value;
         public DimensionType Type => (DimensionType)BaseObject.GetType();
         public string NameForSelection => BaseObject.GetNameForSelection();
 
@@ -52,7 +58,10 @@ namespace CADBooster.SolidDna
             set => SetSystemValue(value, ConfigurationOptions.ThisConfiguration, null);
         }
 
-        public ModelDimension(IDimension dimension) : base(dimension) { }
+        public ModelDimension(IDimension dimension) : base(dimension)
+        {
+            _featureOwner = new Lazy<ModelFeature>(() => new ModelFeature(BaseObject.GetFeatureOwner()));
+        }
 
         public double GetUserValueIn(Model doc)
             => BaseObject.IGetUserValueIn2(doc.UnsafeObject);
@@ -100,5 +109,19 @@ namespace CADBooster.SolidDna
         // - DimensionLineDirection: expose as MathVector (or SolidDna math wrapper)
         // - ExtensionLineDirection: expose as MathVector (or SolidDna math wrapper)
         // - ReferencePoints: expose as array/collection of MathPoint (or wrapped points)
+
+        #region Dispose
+
+        public override void Dispose()
+        {
+            // Dispose lazy-loaded child objects
+            if (_featureOwner.IsValueCreated == true)
+                _featureOwner.Value?.Dispose();
+
+            // Dispose self
+            base.Dispose();
+        }
+
+        #endregion
     }
 }
