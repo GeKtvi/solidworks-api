@@ -1,9 +1,15 @@
 ﻿using SolidWorks.Interop.sldworks;
+using System;
 
 namespace CADBooster.SolidDna
 {
     public class ModelDisplayDimension : SolidDnaObject<IDisplayDimension>
     {
+        #region Private Members
+
+        private readonly Lazy<ModelDimension> _dimension;
+
+        #endregion
         public bool IsArcExtensionLineOrOppositeSide
         {
             get => BaseObject.ArcExtensionLineOrOppositeSide;
@@ -28,7 +34,8 @@ namespace CADBooster.SolidDna
             set => BaseObject.Diametric = value;
         }
 
-        public ModelDimension Dimension => new ModelDimension(BaseObject.IGetDimension());
+
+        public ModelDimension Dimension => _dimension.Value;
 
         public bool IsDimensionedToInside
         {
@@ -165,7 +172,7 @@ namespace CADBooster.SolidDna
 
         public string Text
         {
-            get => GetText(DimensionTextParts.All);
+            get => GetText(DimensionTextParts.Prefix); // "All" not supported, but suffix is most used text in dimension
             set => SetText(DimensionTextParts.All, value);
         }
 
@@ -273,14 +280,29 @@ namespace CADBooster.SolidDna
             set => BaseObject.WitnessVisibility = (int)value;
         }
 
-        public ModelDisplayDimension(IDisplayDimension dimension) : base(dimension) { }
+        public ModelDisplayDimension(IDisplayDimension dimension) : base(dimension)
+        {
+            _dimension = new Lazy<ModelDimension>(() => new ModelDimension(BaseObject.IGetDimension()));
+        }
 
         /// <summary>
         /// Gets chamfer-specific operations for this display dimension.
         /// </summary>
         public ModelDisplayDimensionChamfer Chamfer => Dimension.IsChamferDimension ? new ModelDisplayDimensionChamfer(this) : null;
 
-        public string GetText(DimensionTextParts whichText) => BaseObject.GetText((int)whichText);
+        /// <summary>
+        /// <see cref="DimensionTextParts.All"/> Not supported
+        /// </summary>
+        /// <param name="whichText"><see cref="DimensionTextParts.All"/> is not a valid value for the WhichText parameter for this method.</param>
+        /// <returns></returns>
+        public string GetText(DimensionTextParts whichText) 
+            => whichText == DimensionTextParts.All
+                ? throw new SolidDnaException(SolidDnaErrors.CreateError(
+                    SolidDnaErrorTypeCode.SolidWorksModel,
+                    SolidDnaErrorCode.SolidWorksModelError,
+                    $"{nameof(DimensionTextParts.All)} is not supported for {nameof(GetText)}. Use it in {nameof(SetText)} method."))
+                : BaseObject.GetText((int)whichText);
+
         public void SetText(DimensionTextParts whichText, string text) => BaseObject.SetText((int)whichText, text);
 
         public bool IsExplementaryAngle => BaseObject.ExplementaryAngle();
@@ -351,5 +373,19 @@ namespace CADBooster.SolidDna
         // public ??? ArrowHeadStyle => BaseObject.GetArrowHeadStyle2(ref style1, ref style2);
         // public ??? Fraction => (swFractionDisplay_e)BaseObject.GetFractionBase();
         // public ??? OrdinateDimensionArrowSize => BaseObject.GetOrdinateDimensionArrowSize(out useDoc, out size);
+
+        #region Dispose
+
+        public override void Dispose()
+        {
+            // Dispose lazy-loaded child objects
+            if (_dimension.IsValueCreated == true)
+                _dimension.Value.Dispose();
+
+            // Dispose self
+            base.Dispose();
+        }
+
+        #endregion
     }
 }
