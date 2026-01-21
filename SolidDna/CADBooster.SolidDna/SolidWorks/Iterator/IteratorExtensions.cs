@@ -11,18 +11,18 @@ namespace CADBooster.SolidDna
     public static class IteratorExtensions
     {
         /// <summary>
-        /// Wraps each item in a new SolidDnaObject
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<SolidDnaObject<T>> WrapDnaObject<T>(this IEnumerable<T> dnaObjects)
-            => dnaObjects.Select(x => new SolidDnaObject<T>(x));
-
-        /// <summary>
         /// Wraps a single object in a SolidDnaObject
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static SolidDnaObject<T> ToDnaObject<T>(this T unsafeObject)
             => new SolidDnaObject<T>(unsafeObject);
+
+        /// <summary>
+        /// Wraps each item in a new SolidDnaObject
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<SolidDnaObject<T>> ToDnaObjects<T>(this IEnumerable<T> unsafeObjects)
+            => unsafeObjects.Select(x => new SolidDnaObject<T>(x));
 
         /// <summary>
         /// Wraps objects and registers them with a disposable container
