@@ -22,7 +22,7 @@ namespace CADBooster.SolidDna
                                          DocumentType documentType) : base(commandContextIcon, documentType)
         {
             // The list of icons. There should be a one multi sized icon.
-            var icons = Icons.GetArrayFromDictionary(Icons.GetFormattedPathDictionary(commandContextIcon.Icon));
+            var icons = Icons.GetArrayFromDictionary(Icons.GetFormattedPathDictionary(commandContextIcon.IconPathFormat));
 
             // Get the SolidWorks frame and add the menu icon
             var frame = (IFrame)AddInIntegration.SolidWorks.UnsafeObject.Frame();

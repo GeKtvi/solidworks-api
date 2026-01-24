@@ -117,7 +117,7 @@ namespace SolidDna.CommandItems
                     OnClick = () => System.Windows.MessageBox.Show("Context icon clicked"),
                     OnStateCheck = args => args.Result = CommandManagerItemState.DeselectedEnabled,
                     // Example only. Use indexed single icon instead.
-                    Icon = imageFormat,
+                    IconPathFormat = imageFormat,
                     SelectionType = SelectionType.InContextFeatures
                 },
                 new CommandContextItem

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace CADBooster.SolidDna
 {
@@ -8,12 +8,14 @@ namespace CADBooster.SolidDna
     public class CommandContextIcon : CommandContextBase, ICommandCreatable
     {
         /// <summary>
-        /// Gets or sets the icon formatted path
+        /// Absolute path to the image files that contain the single icon.
+        /// Based on a string format, replacing {0} with the size. For example C:\Folder\Icon{0}.png
+        /// If batch icon files are provided, SolidWorks uses the first icon (no index support).
         /// </summary>
-        public string Icon { get; set; }
+        public string IconPathFormat { get; set; }
 
         /// <summary>
-        /// Gets the name of the command (implementing ICommandCreatable interface)
+        /// The text that displays on mouse hover. In other words, it is the tooltip for the icon button
         /// </summary>
         string ICommandCreatable.Name => Hint;
 
@@ -23,7 +25,7 @@ namespace CADBooster.SolidDna
         /// <param name="path">Not used for icon</param>
         /// <returns>A list of created command context icons</returns>
         /// <exception cref="SolidDnaException">Thrown if the item has already been created</exception>
-        public sealed override IEnumerable<ICommandCreated> Create(string _s = "")
+        public sealed override IEnumerable<ICommandCreated> Create(string path = "")
         {
             _ = base.Create();
 
