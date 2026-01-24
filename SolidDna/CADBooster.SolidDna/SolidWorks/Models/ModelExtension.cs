@@ -74,7 +74,7 @@ public class ModelExtension : SolidDnaObject<ModelDocExtension>
                 var status = statusDefault;
 
                 const int highestAccuracy = 2;
-                var solidWorksVersion = SolidWorksEnvironment.IApplication.SolidWorksVersion;
+                var solidWorksVersion = SolidWorksEnvironment.Application.SolidWorksVersion;
                 double[] massPropertiesArray;
 
                 if (solidWorksVersion == null || solidWorksVersion.Version < 2016)

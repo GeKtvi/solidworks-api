@@ -16,7 +16,7 @@ public static class AddInIntegration
     /// <summary>
     /// Represents the current SolidWorks application
     /// </summary>
-    public static SolidWorksApplication SolidWorks { get; private set; }
+    public static ISolidWorksApplication SolidWorks { get; private set; }
 
     #endregion
 
@@ -41,7 +41,7 @@ public static class AddInIntegration
         try
         {
             // Try and get the active SolidWorks instance
-            SolidWorks = new SolidWorksApplication((SldWorks) Marshal.GetActiveObject("SldWorks.Application"), 0);
+            SolidWorks = new SolidWorksApplicationClass((SldWorks) Marshal.GetActiveObject("SldWorks.Application"), 0);
 
             // Log it
             Logger.LogDebugSource($"Acquired active instance SolidWorks in Stand-Alone mode");
@@ -82,7 +82,7 @@ public static class AddInIntegration
             Logger.LogDebugSource($"Storing the SOLIDWORKS instance...");
 
             // Initialize the SolidDNA wrapper for the SolidWorks application
-            SolidWorks = new SolidWorksApplication(solidworks, cookie);
+            SolidWorks = new SolidWorksApplicationClass(solidworks, cookie);
 
             Logger.LogDebugSource($"SolidWorks instance set");
         }

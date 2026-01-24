@@ -77,7 +77,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     /// Was introduced in SolidWorks 2021.
     /// Not set in the constructor because when you have a model open during startup, the SolidWorks version object is not set yet.
     /// </summary>
-    public ModelSourceProgram ModelSourceProgram => SolidWorksEnvironment.IApplication.SolidWorksVersion.Version < 2021
+    public ModelSourceProgram ModelSourceProgram => SolidWorksEnvironment.Application.SolidWorksVersion.Version < 2021
         ? ModelSourceProgram.SolidWorksDesktop
         : (ModelSourceProgram) Extension.UnsafeObject.Get3DExperienceModelType();
 
@@ -721,11 +721,11 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
         {
             static void RefreshEvent()
             {
-                SolidWorksEnvironment.IApplication.RequestActiveModelChanged();
-                SolidWorksEnvironment.IApplication.Idle -= RefreshEvent;
+                SolidWorksEnvironment.Application.RequestActiveModelChanged();
+                SolidWorksEnvironment.Application.Idle -= RefreshEvent;
             }
 
-            SolidWorksEnvironment.IApplication.Idle += RefreshEvent;
+            SolidWorksEnvironment.Application.Idle += RefreshEvent;
         }
 
         // NOTE: 0 is success, anything else is an error
@@ -773,7 +773,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
         ModelClosing();
 
         // Remove file from list when file is closed/destroyed and stored within this list.
-        SolidWorksApplication.RemoveViewOnlyFilePath(FilePath);
+        SolidWorksApplicationClass.RemoveViewOnlyFilePath(FilePath);
 
         // This is a pre-notify but we are going to be dead
         // so dispose ourselves (our underlying COM objects)
@@ -893,7 +893,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
             {
                 var path = FilePath;
                 Dispose();
-                SolidWorksEnvironment.IApplication.CloseFile(path);
+                SolidWorksEnvironment.Application.CloseFile(path);
             },
             SolidDnaErrorTypeCode.SolidWorksModel,
             SolidDnaErrorCode.SolidWorksModelCloseFileError);
@@ -1149,14 +1149,14 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
                 var materialName = ids[1];
 
                 // See if we have a database file with the same name
-                var fullPath = SolidWorksEnvironment.IApplication.GetMaterials()?.FirstOrDefault(f =>
+                var fullPath = SolidWorksEnvironment.Application.GetMaterials()?.FirstOrDefault(f =>
                     string.Equals(databaseName, Path.GetFileNameWithoutExtension(f.DatabasePathOrFilename), StringComparison.InvariantCultureIgnoreCase));
                 var found = fullPath != null;
 
                 // Now we have the file, try and find the material from it
                 if (found)
                 {
-                    var foundMaterial = SolidWorksEnvironment.IApplication.FindMaterial(fullPath.DatabasePathOrFilename, materialName);
+                    var foundMaterial = SolidWorksEnvironment.Application.FindMaterial(fullPath.DatabasePathOrFilename, materialName);
                     if (foundMaterial != null)
                         return foundMaterial;
                 }
@@ -1390,7 +1390,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     /// </summary>
     /// <param name="configurationName">The configuration name to get the preview for. If null, uses the active configuration.</param>
     /// <returns>A Bitmap containing the preview image</returns>
-    public Bitmap GetPreviewBitmap(string configurationName = null) => SolidWorksEnvironment.IApplication.GetPreviewBitmap(FilePath, configurationName ?? ActiveConfiguration.Name);
+    public Bitmap GetPreviewBitmap(string configurationName = null) => SolidWorksEnvironment.Application.GetPreviewBitmap(FilePath, configurationName ?? ActiveConfiguration.Name);
 
     /// <summary>
     /// Get a preview bitmap from the saved version of the model file for the specified configuration. Does not include unsaved changes.
@@ -1399,7 +1399,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     /// <returns>A Bitmap containing the preview image</returns>
     /// <param name="bitmapFilepath">The filepath to save the bitmap to</param>
     public void SavePreviewBitmap(string bitmapFilepath, string configurationName = null) =>
-        SolidWorksEnvironment.IApplication.SavePreviewBitmap(FilePath, configurationName ?? ActiveConfiguration.Name, bitmapFilepath);
+        SolidWorksEnvironment.Application.SavePreviewBitmap(FilePath, configurationName ?? ActiveConfiguration.Name, bitmapFilepath);
 
     /// <summary>
     /// Saves the current model, with the specified options
@@ -1435,7 +1435,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
                 // as this RCW is now invalid. If this model is not active when saved then 
                 // it will simply reload the active models information
                 if (!HasBeenSaved)
-                    SolidWorksEnvironment.IApplication.RequestActiveModelChanged();
+                    SolidWorksEnvironment.Application.RequestActiveModelChanged();
 
                 // Return result
                 return result;
@@ -1485,7 +1485,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
                 // as this RCW is now invalid. If this model is not active when saved then 
                 // it will simply reload the active models information
                 if (!HasBeenSaved)
-                    SolidWorksEnvironment.IApplication.RequestActiveModelChanged();
+                    SolidWorksEnvironment.Application.RequestActiveModelChanged();
 
                 // Return result
                 return result;
@@ -1511,7 +1511,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
         return SolidDnaErrors.Wrap(() =>
             {
                 // Check if we can save to 3DExperience
-                if (SolidWorksEnvironment.IApplication.ApplicationType == SolidWorksApplicationType.Desktop)
+                if (SolidWorksEnvironment.Application.ApplicationType == SolidWorksApplicationType.Desktop)
                 {
                     // Pick the closest error there is
                     return new ModelSaveResult { Errors = SaveAsErrors.FileSaveFormatNotAvailable };
@@ -1535,7 +1535,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
                 else
                 {
                     // Get a new options object 
-                    var options = (ISaveTo3DExperienceOptions) SolidWorksEnvironment.IApplication.UnsafeObject.GetSaveTo3DExperienceOptions();
+                    var options = (ISaveTo3DExperienceOptions) SolidWorksEnvironment.Application.UnsafeObject.GetSaveTo3DExperienceOptions();
 
                     // Add relevant data
                     options.FileName = filename;
@@ -1561,7 +1561,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
                 // as this RCW is now invalid. If this model is not active when saved then 
                 // it will simply reload the active models information
                 if (!HasBeenSaved)
-                    SolidWorksEnvironment.IApplication.RequestActiveModelChanged();
+                    SolidWorksEnvironment.Application.RequestActiveModelChanged();
 
                 return result;
             },

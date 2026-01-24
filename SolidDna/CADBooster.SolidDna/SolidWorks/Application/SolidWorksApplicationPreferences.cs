@@ -6,7 +6,7 @@ namespace CADBooster.SolidDna;
 /// <summary>
 /// Represents the current SolidWorks application
 /// </summary>
-public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISolidWorksApplication
+public partial class SolidWorksApplicationClass : SharedSolidDnaObject<SldWorks>, ISolidWorksApplication
 {
     /// <summary>
     /// An embedded class to manage SolidWorks application preferences.
@@ -18,8 +18,8 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
         /// </summary>
         public string DefaultAssemblyTemplate
         {
-            get => SolidWorksEnvironment.IApplication.GetUserPreferencesString(swUserPreferenceStringValue_e.swDefaultTemplateAssembly);
-            set => SolidWorksEnvironment.IApplication.SetUserPreferencesString(swUserPreferenceStringValue_e.swDefaultTemplateAssembly, value);
+            get => SolidWorksEnvironment.Application.GetUserPreferencesString(swUserPreferenceStringValue_e.swDefaultTemplateAssembly);
+            set => SolidWorksEnvironment.Application.SetUserPreferencesString(swUserPreferenceStringValue_e.swDefaultTemplateAssembly, value);
         }
 
         /// <summary>
@@ -27,8 +27,8 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
         /// </summary>
         public string DefaultDrawingTemplate
         {
-            get => SolidWorksEnvironment.IApplication.GetUserPreferencesString(swUserPreferenceStringValue_e.swDefaultTemplateDrawing);
-            set => SolidWorksEnvironment.IApplication.SetUserPreferencesString(swUserPreferenceStringValue_e.swDefaultTemplateDrawing, value);
+            get => SolidWorksEnvironment.Application.GetUserPreferencesString(swUserPreferenceStringValue_e.swDefaultTemplateDrawing);
+            set => SolidWorksEnvironment.Application.SetUserPreferencesString(swUserPreferenceStringValue_e.swDefaultTemplateDrawing, value);
         }
 
         /// <summary>
@@ -36,8 +36,8 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
         /// </summary>
         public string DefaultPartTemplate
         {
-            get => SolidWorksEnvironment.IApplication.GetUserPreferencesString(swUserPreferenceStringValue_e.swDefaultTemplatePart);
-            set => SolidWorksEnvironment.IApplication.SetUserPreferencesString(swUserPreferenceStringValue_e.swDefaultTemplatePart, value);
+            get => SolidWorksEnvironment.Application.GetUserPreferencesString(swUserPreferenceStringValue_e.swDefaultTemplatePart);
+            set => SolidWorksEnvironment.Application.SetUserPreferencesString(swUserPreferenceStringValue_e.swDefaultTemplatePart, value);
         }
 
         /// <summary>
@@ -45,8 +45,8 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
         /// </summary>
         public double DxfOutputScaleFactor
         {
-            get => SolidWorksEnvironment.IApplication.GetUserPreferencesDouble(swUserPreferenceDoubleValue_e.swDxfOutputScaleFactor);
-            set => SolidWorksEnvironment.IApplication.SetUserPreferencesDouble(swUserPreferenceDoubleValue_e.swDxfOutputScaleFactor, value);
+            get => SolidWorksEnvironment.Application.GetUserPreferencesDouble(swUserPreferenceDoubleValue_e.swDxfOutputScaleFactor);
+            set => SolidWorksEnvironment.Application.SetUserPreferencesDouble(swUserPreferenceDoubleValue_e.swDxfOutputScaleFactor, value);
         }
 
         /// <summary>
@@ -54,8 +54,8 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
         /// </summary>
         public int DxfMultiSheetOption
         {
-            get => SolidWorksEnvironment.IApplication.GetUserPreferencesInteger(swUserPreferenceIntegerValue_e.swDxfMultiSheetOption);
-            set => SolidWorksEnvironment.IApplication.SetUserPreferencesInteger(swUserPreferenceIntegerValue_e.swDxfMultiSheetOption, value);
+            get => SolidWorksEnvironment.Application.GetUserPreferencesInteger(swUserPreferenceIntegerValue_e.swDxfMultiSheetOption);
+            set => SolidWorksEnvironment.Application.SetUserPreferencesInteger(swUserPreferenceIntegerValue_e.swDxfMultiSheetOption, value);
         }
 
         /// <summary>
@@ -63,8 +63,8 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
         /// </summary>
         public bool DxfOutputNoScale
         {
-            get => SolidWorksEnvironment.IApplication.GetUserPreferencesInteger(swUserPreferenceIntegerValue_e.swDxfOutputNoScale) == 1;
-            set => SolidWorksEnvironment.IApplication.SetUserPreferencesInteger(swUserPreferenceIntegerValue_e.swDxfOutputNoScale, value ? 1 : 0);
+            get => SolidWorksEnvironment.Application.GetUserPreferencesInteger(swUserPreferenceIntegerValue_e.swDxfOutputNoScale) == 1;
+            set => SolidWorksEnvironment.Application.SetUserPreferencesInteger(swUserPreferenceIntegerValue_e.swDxfOutputNoScale, value ? 1 : 0);
         }
     }
 }

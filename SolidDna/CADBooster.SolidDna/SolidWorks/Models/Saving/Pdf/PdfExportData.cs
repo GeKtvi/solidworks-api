@@ -72,7 +72,7 @@ public class PdfExportData
         SolidDnaErrors.Wrap(() =>
             {
                 // Try and get export data object
-                mExportData = SolidWorksEnvironment.IApplication.GetPdfExportData();
+                mExportData = SolidWorksEnvironment.Application.GetPdfExportData();
             },
             SolidDnaErrorTypeCode.ExportData,
             SolidDnaErrorCode.SolidWorksExportDataGetPdfExportDataError);

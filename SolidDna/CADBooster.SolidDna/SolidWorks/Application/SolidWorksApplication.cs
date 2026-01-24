@@ -14,7 +14,7 @@ namespace CADBooster.SolidDna;
 /// <summary>
 /// Represents the current SolidWorks application
 /// </summary>
-public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISolidWorksApplication
+public partial class SolidWorksApplicationClass : SharedSolidDnaObject<SldWorks>, ISolidWorksApplication
 {
     #region Protected Members
 
@@ -131,7 +131,7 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
     /// <summary>
     /// Default constructor
     /// </summary>
-    public SolidWorksApplication(SldWorks solidWorks, int cookie) : base(solidWorks)
+    public SolidWorksApplicationClass(SldWorks solidWorks, int cookie) : base(solidWorks)
     {
         // Set properties that never change
         Preferences = new SolidWorksPreferences();

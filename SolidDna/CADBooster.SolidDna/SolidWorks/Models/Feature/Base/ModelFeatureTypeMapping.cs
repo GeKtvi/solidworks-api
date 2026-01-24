@@ -786,5 +786,5 @@ public static class ModelFeatureTypeMapping
     /// Helper property to get the SOLIDWORKS version year.
     /// If unknown will return -1.
     /// </summary>
-    private static int VersionYear => SolidWorksEnvironment.IApplication.SolidWorksVersion.Version;
+    private static int VersionYear => SolidWorksEnvironment.Application.SolidWorksVersion.Version;
 }

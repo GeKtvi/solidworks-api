@@ -441,7 +441,7 @@ public class Component : SolidDnaObject<Component2>, IComponent
         var rootAssemblyName = selectByIdString.Substring(lastIndex + 1) + ".sldasm";
 
         // Get the assembly model by its name. Should never be null because the top-level assembly model is always loaded.
-        var modelDoc = SolidWorksEnvironment.IApplication.UnsafeObject.GetOpenDocument(rootAssemblyName);
+        var modelDoc = SolidWorksEnvironment.Application.UnsafeObject.GetOpenDocument(rootAssemblyName);
         return new Model(modelDoc);
     }
 

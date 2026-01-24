@@ -7,11 +7,14 @@ using System.Threading.Tasks;
 
 namespace CADBooster.SolidDna;
 
+public interface ISolidWorksApplication : SolidWorksApplication;
+
 /// <summary>
 /// Interface for the SolidWorks application wrapper.
 /// Enables mocking for unit testing.
 /// </summary>
-public interface ISolidWorksApplication : IDisposable
+[Obsolete("Please use ISolidWorksApplication instead. It is temporary interface for backward compatibility, do not use it")]
+public interface SolidWorksApplication : IDisposable
 {
     #region Properties
 
@@ -44,7 +47,7 @@ public interface ISolidWorksApplication : IDisposable
     /// <summary>
     /// Various preferences for SolidWorks
     /// </summary>
-    SolidWorksApplication.SolidWorksPreferences Preferences { get; }
+    SolidWorksApplicationClass.SolidWorksPreferences Preferences { get; }
 
     /// <summary>
     /// Gets the current SolidWorks version information

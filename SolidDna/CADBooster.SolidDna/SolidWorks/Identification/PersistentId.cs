@@ -88,7 +88,7 @@ public class PersistentId
             throw new ArgumentNullException(nameof(obj));
 
         // Get the raw persistent reference object
-        var persistentRefObject = SolidWorksEnvironment.IApplication.ActiveModel.Extension.UnsafeObject.GetPersistReference3(obj);
+        var persistentRefObject = SolidWorksEnvironment.Application.ActiveModel.Extension.UnsafeObject.GetPersistReference3(obj);
 
         // Make sure it's not null
         if (persistentRefObject == null)
@@ -188,7 +188,7 @@ public class PersistentId
     public T GetObject<T>() where T : class
     {
         // Try to get an object by its persistent ID
-        var obj = SolidWorksEnvironment.IApplication.ActiveModel.Extension.UnsafeObject.GetObjectByPersistReference3(ByteArray, out var errorCode);
+        var obj = SolidWorksEnvironment.Application.ActiveModel.Extension.UnsafeObject.GetObjectByPersistReference3(ByteArray, out var errorCode);
 
         // If there is no error, return the object
         if (errorCode == 0)
@@ -209,7 +209,7 @@ public class PersistentId
     /// </summary>
     /// <returns></returns>
     // ReSharper disable once UnusedVariable
-    public T GetObjectOrNull<T>() where T : class => (T) SolidWorksEnvironment.IApplication.ActiveModel?.Extension?.UnsafeObject.GetObjectByPersistReference3(ByteArray, out var errorCode);
+    public T GetObjectOrNull<T>() where T : class => (T) SolidWorksEnvironment.Application.ActiveModel?.Extension?.UnsafeObject.GetObjectByPersistReference3(ByteArray, out var errorCode);
 
     #endregion
 
