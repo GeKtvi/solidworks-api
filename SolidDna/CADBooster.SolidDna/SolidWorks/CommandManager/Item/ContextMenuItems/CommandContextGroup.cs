@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CADBooster.SolidDna
 {
     /// <summary>
-    /// Represents a command context menu group in SolidWorks
+    /// Represents a command context group in SolidWorks
     /// </summary>
-    public class CommandContextMenuGroup : ICommandCreatable
+    public class CommandContextGroup : ICommandCreatable
     {
         private bool _isCreated;
 
@@ -25,10 +25,10 @@ namespace CADBooster.SolidDna
         #endregion
 
         /// <summary>
-        /// Creates the command context menu group and its items
+        /// Creates the command context group and its items
         /// </summary>
         /// <param name="path">The hierarchical path for the group</param>
-        /// <returns>A list of created command context menu items</returns>
+        /// <returns>A list of created command context items</returns>
         /// <exception cref="SolidDnaException">Thrown if the group has already been created</exception>
         public IEnumerable<ICommandCreated> Create(string path)
         {
@@ -39,9 +39,9 @@ namespace CADBooster.SolidDna
 
             _isCreated = true;
 
-            return Enumerable.Repeat(new CommandContextMenuGroupCreated(Name, path, Items), 1);
+            return Enumerable.Repeat(new CommandContextGroupCreated(Name, path, Items), 1);
         }
 
-        public override string ToString() => $"ContextMenuGroup with name: {Name}. Count of sub items: {Items.Count}";
+        public override string ToString() => $"ContextGroup with name: {Name}. Count of sub items: {Items.Count}";
     }
 }

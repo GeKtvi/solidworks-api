@@ -1,21 +1,21 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CADBooster.SolidDna
 {
     /// <summary>
-    /// Represents a created command context menu group in SolidWorks
+    /// Represents a created command context group in SolidWorks
     /// This class handles the creation and disposal of a group of context menu items
     /// </summary>
-    internal class CommandContextMenuGroupCreated : ICommandCreated
+    internal class CommandContextGroupCreated : ICommandCreated
     {
         /// <summary>
-        /// Gets the unique callback ID for this command context menu group
+        /// Gets the unique callback ID for this command context group
         /// </summary>
         public string CallbackId => string.Empty;
 
         /// <summary>
-        /// Gets the name of this command context menu group
+        /// Gets the name of this command context group
         /// </summary>
         public string Name { get; }
 
@@ -25,12 +25,12 @@ namespace CADBooster.SolidDna
         private readonly List<ICommandCreated> _createdItems;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommandContextMenuGroupCreated"/> class
+        /// Initializes a new instance of the <see cref="CommandContextGroupCreated"/> class
         /// </summary>
         /// <param name="name">The name of the group</param>
         /// <param name="path">The hierarchical path for the group</param>
         /// <param name="items">The list of command items to include in the group</param>
-        public CommandContextMenuGroupCreated(string name, string path, List<ICommandCreatable> items)
+        public CommandContextGroupCreated(string name, string path, List<ICommandCreatable> items)
         {
             Name = name;
 
