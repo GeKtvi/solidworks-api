@@ -1,15 +1,14 @@
 ﻿using System;
 
-namespace CADBooster.SolidDna
+namespace CADBooster.SolidDna;
+
+/// <summary>
+/// Represents an interface for a created command item in SolidWorks
+/// </summary>
+public interface ICommandCreated : IDisposable
 {
     /// <summary>
-    /// Represents an interface for a created command item in SolidWorks
+    /// Gets the name of the created command item
     /// </summary>
-    public interface ICommandCreated : IDisposable
-    {
-        /// <summary>
-        /// Gets the name of the created command item
-        /// </summary>
-        string Name { get; }
-    }
+    string Name { get; }
 }

@@ -2,59 +2,58 @@
 using SolidWorks.Interop.swconst;
 using System;
 
-namespace CADBooster.SolidDna
+namespace CADBooster.SolidDna;
+
+/// <summary>
+/// Represents a selected object of a SolidWorks object.
+/// The type can be one of many different things
+/// 
+/// NOTE: All mappings from selected entities to specific objects are here
+/// http://help.solidworks.com/2026/English/api/swconst/SolidWorks.Interop.swconst~SolidWorks.Interop.swconst.swSelectType_e.html
+/// </summary>
+public class SelectedObject : SolidDnaObject<object>, ISelectedObject
 {
+    #region Public Properties
+
     /// <summary>
-    /// Represents a selected object of a SolidWorks object.
-    /// The type can be one of many different things
-    /// 
-    /// NOTE: All mappings from selected entities to specific objects are here
-    /// http://help.solidworks.com/2020/English/api/swconst/SolidWorks.Interop.swconst~SolidWorks.Interop.swconst.swSelectType_e.html
+    /// The type of the selected object
     /// </summary>
-    public class SelectedObject : SolidDnaObject<object>
-    {
-        #region Public Properties
+    public swSelectType_e ObjectType { get; }
 
-        /// <summary>
-        /// The type of the selected object
-        /// </summary>
-        public swSelectType_e ObjectType { get; private set; } = swSelectType_e.swSelEVERYTHING;
+    #region Type Checks
 
-        #region Type Checks
+    /// <summary>
+    /// True if this object is a feature.
+    /// From the feature you can check the specific feature type and get the specific feature from that.
+    /// </summary>
+    public bool IsFeature => ObjectType == swSelectType_e.swSelDATUMPLANES ||
+                             ObjectType == swSelectType_e.swSelDATUMAXES ||
+                             ObjectType == swSelectType_e.swSelDATUMPOINTS ||
+                             ObjectType == swSelectType_e.swSelATTRIBUTES ||
+                             ObjectType == swSelectType_e.swSelSKETCHES ||
+                             ObjectType == swSelectType_e.swSelSECTIONLINES ||
+                             ObjectType == swSelectType_e.swSelDETAILCIRCLES ||
+                             ObjectType == swSelectType_e.swSelMATES ||
+                             ObjectType == swSelectType_e.swSelBODYFEATURES ||
+                             ObjectType == swSelectType_e.swSelREFCURVES ||
+                             ObjectType == swSelectType_e.swSelREFERENCECURVES ||
+                             ObjectType == swSelectType_e.swSelCTHREADS ||
+                             ObjectType == swSelectType_e.swSelCONFIGURATIONS ||
+                             ObjectType == swSelectType_e.swSelREFSILHOUETTE ||
+                             ObjectType == swSelectType_e.swSelCAMERAS ||
+                             ObjectType == swSelectType_e.swSelSWIFTANNOTATIONS ||
+                             ObjectType == swSelectType_e.swSelSWIFTFEATURES;
 
-        /// <summary>
-        /// True if this object is a feature.
-        /// From the feature you can check the specific feature type and
-        /// get the specific feature from that
-        /// </summary>
-        public bool IsFeature => ObjectType == swSelectType_e.swSelDATUMPLANES ||
-                    ObjectType == swSelectType_e.swSelDATUMAXES ||
-                    ObjectType == swSelectType_e.swSelDATUMPOINTS ||
-                    ObjectType == swSelectType_e.swSelATTRIBUTES ||
-                    ObjectType == swSelectType_e.swSelSKETCHES ||
-                    ObjectType == swSelectType_e.swSelSECTIONLINES ||
-                    ObjectType == swSelectType_e.swSelDETAILCIRCLES ||
-                    ObjectType == swSelectType_e.swSelMATES ||
-                    ObjectType == swSelectType_e.swSelBODYFEATURES ||
-                    ObjectType == swSelectType_e.swSelREFCURVES ||
-                    ObjectType == swSelectType_e.swSelREFERENCECURVES ||
-                    ObjectType == swSelectType_e.swSelCTHREADS ||
-                    ObjectType == swSelectType_e.swSelCONFIGURATIONS ||
-                    ObjectType == swSelectType_e.swSelREFSILHOUETTE ||
-                    ObjectType == swSelectType_e.swSelCAMERAS ||
-                    ObjectType == swSelectType_e.swSelSWIFTANNOTATIONS ||
-                    ObjectType == swSelectType_e.swSelSWIFTFEATURES;
+    /// <summary>
+    /// True if this object is a dimension.
+    /// </summary>
+    public bool IsDimension => ObjectType == swSelectType_e.swSelDIMENSIONS;
 
-        /// <summary>
-        /// True if this object is a dimension
-        /// </summary>
-        public bool IsDimension => ObjectType == swSelectType_e.swSelDIMENSIONS;
+    #endregion
 
-        #endregion
+    #endregion
 
-        #endregion
-
-        #region Constructor
+    #region Constructor
 
         /// <summary>
         /// Default constructor
@@ -71,7 +70,7 @@ namespace CADBooster.SolidDna
 
         #endregion
 
-        #region Type Cast
+    #region Type Cast
 
         /// <summary>
         /// Casts the object to a <see cref="ModelFeature"/>.
@@ -85,15 +84,13 @@ namespace CADBooster.SolidDna
             SolidDnaErrors.Wrap(() =>
             {
                 // Create feature
-                using (var model = new ModelFeature((Feature)BaseObject))
-                {
-                    // Run action
-                    action(model);
-                }
+                using var model = new ModelFeature((Feature) BaseObject);
+                // Run action
+                action(model);
             },
-                SolidDnaErrorTypeCode.SolidWorksModel,
-                SolidDnaErrorCode.SolidWorksModelSelectedObjectCastError);
-        }
+            SolidDnaErrorTypeCode.SolidWorksModel,
+            SolidDnaErrorCode.SolidWorksModelSelectedObjectCastError);
+    }
 
         /// <summary>
         /// Casts the object to a <see cref="ModelDisplayDimension"/>.
@@ -107,16 +104,13 @@ namespace CADBooster.SolidDna
             SolidDnaErrors.Wrap(() =>
             {
                 // Create feature
-                using (var model = new ModelDisplayDimension((IDisplayDimension)BaseObject))
-                {
-                    // Run action
-                    action(model);
-                }
+                using var model = new ModelDisplayDimension((IDisplayDimension) BaseObject);
+                // Run action
+                action(model);
             },
-                SolidDnaErrorTypeCode.SolidWorksModel,
-                SolidDnaErrorCode.SolidWorksModelSelectedObjectCastError);
-        }
-
-        #endregion
+            SolidDnaErrorTypeCode.SolidWorksModel,
+            SolidDnaErrorCode.SolidWorksModelSelectedObjectCastError);
     }
+
+    #endregion
 }

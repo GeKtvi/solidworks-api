@@ -1,43 +1,42 @@
 ﻿using SolidWorks.Interop.sldworks;
 using System.Runtime.InteropServices;
 
-namespace CADBooster.SolidDna
+namespace CADBooster.SolidDna;
+
+/// <summary>
+/// Represents a created command context icon in the SolidWorks
+/// </summary>
+internal class CommandContextIconCreated : CommandContextCreatedBase
 {
     /// <summary>
-    /// Represents a created command context icon in the SolidWorks
+    /// Gets the name of this command context item
     /// </summary>
-    internal class CommandContextIconCreated : CommandContextCreatedBase
+    public sealed override string Name => Hint;
+
+    /// <summary>
+    /// Initializes a new command context icon in the SolidWorks UI
+    /// </summary>
+    /// <param name="commandContextIcon">The icon configuration</param>
+    /// <param name="documentType">The document type this icon applies to</param>
+    public CommandContextIconCreated(CommandContextIcon commandContextIcon,
+                                     DocumentType documentType) : base(commandContextIcon, documentType)
     {
-        /// <summary>
-        /// Gets the name of this command context item
-        /// </summary>
-        public sealed override string Name => Hint;
+        // The list of icons. There should be a one multi sized icon.
+        var icons = Icons.GetArrayFromDictionary(Icons.GetFormattedPathDictionary(commandContextIcon.Icon));
 
-        /// <summary>
-        /// Initializes a new command context icon in the SolidWorks UI
-        /// </summary>
-        /// <param name="commandContextIcon">The icon configuration</param>
-        /// <param name="documentType">The document type this icon applies to</param>
-        public CommandContextIconCreated(CommandContextIcon commandContextIcon,
-                                         DocumentType documentType) : base(commandContextIcon, documentType)
-        {
-            // The list of icons. There should be a one multi sized icon.
-            var icons = Icons.GetArrayFromDictionary(Icons.GetFormattedPathDictionary(commandContextIcon.Icon));
+        // Get the SolidWorks frame and add the menu icon
+        var frame = (IFrame)AddInIntegration.SolidWorks.UnsafeObject.Frame();
 
-            // Get the SolidWorks frame and add the menu icon
-            var frame = (IFrame)AddInIntegration.SolidWorks.UnsafeObject.Frame();
+        _ = frame.AddMenuPopupIcon3(
+            (int)DocumentType,
+            SelectionType,
+            Hint,
+            SolidWorksEnvironment.Application.SolidWorksCookie,
+            $"{nameof(SolidAddIn.Callback)}({CallbackId})",
+            $"{nameof(SolidAddIn.ItemStateCheck)}({CallbackId})",
+            SelectionType.GetCustomFeatureNames(),
+            icons);
 
-            _ = frame.AddMenuPopupIcon3(
-                (int)DocumentType,
-                SelectionType,
-                Hint,
-                SolidWorksEnvironment.Application.SolidWorksCookie,
-                $"{nameof(SolidAddIn.Callback)}({CallbackId})",
-                $"{nameof(SolidAddIn.ItemStateCheck)}({CallbackId})",
-                SelectionType.GetCustomFeaturesSelection(),
-                icons);
-
-            _ = Marshal.ReleaseComObject(frame);
-        }
+        _ = Marshal.ReleaseComObject(frame);
     }
 }

@@ -1,12 +1,12 @@
 ﻿using SolidWorks.Interop.sldworks;
 
-namespace CADBooster.SolidDna
+namespace CADBooster.SolidDna;
+
+/// <summary>
+/// Represents a SolidWorks Distance Mate feature data
+/// </summary>
+public class FeatureDistanceMateData : SolidDnaObject<IDistanceMateFeatureData>
 {
-    /// <summary>
-    /// Represents a SolidWorks Distance Mate feature data
-    /// </summary>
-    public class FeatureDistanceMateData : SolidDnaObject<IDistanceMateFeatureData>
-    {
     #region Constructor
 
     /// <summary>
@@ -14,9 +14,7 @@ namespace CADBooster.SolidDna
     /// </summary>
     public FeatureDistanceMateData(IDistanceMateFeatureData model) : base(model)
     {
-
     }
 
     #endregion
-    }
 }

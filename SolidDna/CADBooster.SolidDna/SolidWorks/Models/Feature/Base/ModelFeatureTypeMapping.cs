@@ -1,785 +1,790 @@
-﻿using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.sldworks;
 
-namespace CADBooster.SolidDna
+namespace CADBooster.SolidDna;
+
+/// <summary>
+/// Maps SolidWorks model Features to their specific types
+/// </summary>
+public static class ModelFeatureTypeMapping
 {
     /// <summary>
-    /// Maps SolidWorks model Features to their specific types
+    /// Convert a ModelFeature type name string to its specific feature type enum value.
     /// </summary>
-    public static class ModelFeatureTypeMapping
+    /// <param name="feature"></param>
+    /// <returns></returns>
+    public static ModelFeatureType SpecificFeatureType(this ModelFeature feature)
     {
-        public static ModelFeatureType SpecificFeatureType(this ModelFeature feature)
+        // Get type name
+        var type = feature?.FeatureTypeName;
+
+        // Make sure we have one
+        if (feature == null || type.IsNullOrEmpty())
+            return ModelFeatureType.None;
+
+        // Map to feature types based on this list
+        // http://help.solidworks.com/2026/english/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.IFeature~GetTypeName2.html
+
+        switch (type)
         {
-            // Get type name
-            var type = feature?.FeatureTypeName;
+            #region Assembly
 
-            // Make sure we have one
-            if (feature == null || string.IsNullOrEmpty(type))
-                return ModelFeatureType.None;
+            // NOTE: No interface
+            case "AsmExploder":
+                return ModelFeatureType.AssemblyExplodedView;
 
-            // Map to feature types based on this list
-            // http://help.solidworks.com/2020/english/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.IFeature~GetTypeName2.html
+            // NOTE: No interface
+            case "CompExplodeStep":
+                return ModelFeatureType.AssemblyExplodeStep;
 
-            switch (type)
-            {
-                #region Assembly
+            case "ExplodeLineProfileFeature":
+                return ModelFeatureType.Sketch;
 
-                // NOTE: No interface
-                case "AsmExploder":
-                    return ModelFeatureType.AssemblyExplodedView;
+            case "InContextFeatHolder":
+            case "MagneticGroundPlane":
+                return ModelFeatureType.Feature;
 
-                // NOTE: No interface
-                case "CompExplodeStep":
-                    return ModelFeatureType.AssemblyExplodeStep;
+            case "MateCamTangent":
+                return ModelFeatureType.CamFollowerMateData;
 
-                case "ExplodeLineProfileFeature":
-                    return ModelFeatureType.Sketch;
+            case "MateCoincident":
+                return VersionYear < 2019 ? ModelFeatureType.Mate : ModelFeatureType.CoincidentMateData;
 
-                case "InContextFeatHolder":
-                case "MagneticGroundPlane":
-                    return ModelFeatureType.Feature;
+            case "MateConcentric":
+                return VersionYear < 2019 ? ModelFeatureType.Mate : ModelFeatureType.ConcentricMateData;
 
-                case "MateCamTangent":
-                    return ModelFeatureType.CamFollowerMateData;
+            case "MateDistanceDim":
+                return VersionYear < 2018 ? ModelFeatureType.Mate : ModelFeatureType.DistanceMateData;
 
-                case "MateCoincident":
-                    return VersionYear < 2019 ? ModelFeatureType.Mate : ModelFeatureType.CoincidentMateData;
+            case "MateGearDim":
+                return ModelFeatureType.GearMateData;
 
-                case "MateConcentric":
-                    return VersionYear < 2019 ? ModelFeatureType.Mate : ModelFeatureType.ConcentricMateData;
-                
-                case "MateDistanceDim":
-                    return VersionYear < 2018 ? ModelFeatureType.Mate : ModelFeatureType.DistanceMateData;
-                
-                case "MateGearDim":
-                    return ModelFeatureType.GearMateData;
+            case "MateGroup":
+                return ModelFeatureType.MateGroup;
 
-                case "MateGroup":
-                    return ModelFeatureType.MateGroup;
+            case "MateHinge":
+                return ModelFeatureType.HingeMateData;
 
-                case "MateHinge":
-                    return ModelFeatureType.HingeMateData;
-                
-                case "MateInPlace":
-                    return ModelFeatureType.Mate;
+            case "MateInPlace":
+                return ModelFeatureType.MateInPlace;
 
-                case "MateLinearCoupler":
-                    return ModelFeatureType.LinearCouplerMateData;
+            case "MateLinearCoupler":
+                return ModelFeatureType.LinearCouplerMateData;
 
-                case "MateLock":
-                    return ModelFeatureType.LockMateData;
+            case "MateLock":
+                return ModelFeatureType.LockMateData;
 
-                case "MateParallel":
-                    return VersionYear < 2019 ? ModelFeatureType.Mate : ModelFeatureType.ParallelMateData;
+            case "MateParallel":
+                return VersionYear < 2019 ? ModelFeatureType.Mate : ModelFeatureType.ParallelMateData;
 
-                case "MatePerpendicular":
-                    return VersionYear < 2019 ? ModelFeatureType.Mate : ModelFeatureType.PerpendicularMateData;
+            case "MatePerpendicular":
+                return VersionYear < 2019 ? ModelFeatureType.Mate : ModelFeatureType.PerpendicularMateData;
 
-                case "MatePlanarAngleDim":
-                    return VersionYear < 2018 ? ModelFeatureType.Mate : ModelFeatureType.AngleMateData;
+            case "MatePlanarAngleDim":
+                return VersionYear < 2018 ? ModelFeatureType.Mate : ModelFeatureType.AngleMateData;
 
-                case "MateProfileCenter":
-                    return ModelFeatureType.ProfileCenterMateData;
+            case "MateProfileCenter":
+                return ModelFeatureType.ProfileCenterMateData;
 
-                case "MateRackPinionDim":
-                    return ModelFeatureType.RackPinionMateData;
+            case "MateRackPinionDim":
+                return ModelFeatureType.RackPinionMateData;
 
-                case "MateScrew":
-                    return ModelFeatureType.ScrewMateData;
+            case "MateScrew":
+                return ModelFeatureType.ScrewMateData;
 
-                case "MateSlot":
-                    return ModelFeatureType.SlotMateData;
+            case "MateSlot":
+                return ModelFeatureType.SlotMateData;
 
-                case "MateSymmetric":
-                    return VersionYear < 2018 ? ModelFeatureType.Mate : ModelFeatureType.SymmetricMateData;
+            case "MateSymmetric":
+                return VersionYear < 2018 ? ModelFeatureType.Mate : ModelFeatureType.SymmetricMateData;
 
-                case "MateTangent":
-                    return VersionYear < 2019 ? ModelFeatureType.Mate : ModelFeatureType.TangentMateData;
-                
-                case "MateUniversalJoint":
-                    return ModelFeatureType.UniversalJointMateData;
+            case "MateTangent":
+                return VersionYear < 2019 ? ModelFeatureType.Mate : ModelFeatureType.TangentMateData;
 
-                case "MateWidth":
-                    return VersionYear < 2018 ? ModelFeatureType.Mate : ModelFeatureType.WidthMateData;
+            case "MateUniversalJoint":
+                return ModelFeatureType.UniversalJointMateData;
 
-                case "PosGroup":
-                    return ModelFeatureType.MateReference;
+            case "MateWidth":
+                return VersionYear < 2018 ? ModelFeatureType.Mate : ModelFeatureType.WidthMateData;
 
-                case "Reference": // removed from the 2018 and later help page
-                case "ReferencePattern": // a patterned component, not in the docs
-                    return ModelFeatureType.Component;
+            case "PosGroup":
+                return ModelFeatureType.MateReference;
 
-                case "SmartComponentFeature":
-                    return ModelFeatureType.SmartComponentFeatureData;
+            case "Reference": // removed from the 2018 and later help page
+            case "ReferencePattern": // a patterned component, not in the docs
+                return ModelFeatureType.Component;
 
-                #endregion
+            case "SmartComponentFeature":
+                return ModelFeatureType.SmartComponentFeatureData;
 
-                #region Body
+            #endregion
 
-                case "AdvHoleWzd":
-                    return ModelFeatureType.AdvancedHoleWizardData;
+            #region Body
 
-                case "APattern":
-                    return ModelFeatureType.FillPatternData;
+            case "AdvHoleWzd":
+                return ModelFeatureType.AdvancedHoleWizardData;
 
-                case "BaseBody":
-                    return ModelFeatureType.ExtrudeData;
+            case "APattern":
+                return ModelFeatureType.FillPatternData;
 
-                // NOTE: No interface
-                case "Bending":
-                    return ModelFeatureType.Flex;
+            case "BaseBody":
+                return ModelFeatureType.ExtrudeData;
 
-                case "Blend":
-                case "BlendCut":
-                    return ModelFeatureType.LoftData;
+            // NOTE: No interface
+            case "Bending":
+                return ModelFeatureType.Flex;
 
-                // NOTE: No interface
-                case "BodyExplodeStep":
-                    return ModelFeatureType.MultiBodyPartExplodeStep;
+            case "Blend":
+            case "BlendCut":
+                return ModelFeatureType.LoftData;
 
-                case "Boss":
-                case "BossThin":
-                    return ModelFeatureType.ExtrudeData;
+            // NOTE: No interface
+            case "BodyExplodeStep":
+                return ModelFeatureType.MultiBodyPartExplodeStep;
 
-                case "Chamfer":
-                    return ModelFeatureType.ChamferData;
+            case "Boss":
+            case "BossThin":
+                return ModelFeatureType.ExtrudeData;
 
-                case "CirPattern":
-                    return ModelFeatureType.CircularPatternData;
+            case "Chamfer":
+                return ModelFeatureType.ChamferData;
 
-                case "CombineBodies":
-                    return ModelFeatureType.CombineBodiesData;
+            case "CirPattern":
+                return ModelFeatureType.CircularPatternData;
 
-                case "CosmeticThread":
-                    return ModelFeatureType.CosmeticThreadData;
+            case "CombineBodies":
+                return ModelFeatureType.CombineBodiesData;
 
-                case "CreateAssemFeat":
-                    return ModelFeatureType.SaveBodyData;
+            case "CosmeticThread":
+                return ModelFeatureType.CosmeticThreadData;
 
-                case "CurvePattern":
-                    return ModelFeatureType.CurveDrivenPatternData;
+            case "CreateAssemFeat":
+                return ModelFeatureType.SaveBodyData;
 
-                case "Cut":
-                case "CutThin":
-                    return ModelFeatureType.ExtrudeData;
+            case "CurvePattern":
+                return ModelFeatureType.CurveDrivenPatternData;
 
-                // NOTE: No interface
-                case "Deform":
-                    return ModelFeatureType.Deform;
+            case "Cut":
+            case "CutThin":
+                return ModelFeatureType.ExtrudeData;
 
-                case "DeleteBody":
-                    return ModelFeatureType.DeleteBodyData;
+            // NOTE: No interface
+            case "Deform":
+                return ModelFeatureType.Deform;
 
-                case "DelFace":
-                    return ModelFeatureType.DeleteFaceData;
+            case "DeleteBody":
+                return ModelFeatureType.DeleteBodyData;
 
-                case "DerivedCirPattern":
-                case "DerivedHolePattern":
-                case "DerivedLPattern":
-                    return ModelFeatureType.DerivedPatternData;
+            case "DelFace":
+                return ModelFeatureType.DeleteFaceData;
 
-                case "DimPattern":
-                    return ModelFeatureType.DimPatternData;
+            case "DerivedCirPattern":
+            case "DerivedHolePattern":
+            case "DerivedLPattern":
+                return ModelFeatureType.DerivedPatternData;
 
-                case "Dome":
-                    return ModelFeatureType.DomeData;
+            case "DimPattern":
+                return ModelFeatureType.DimPatternData;
 
-                case "Draft":
-                    return ModelFeatureType.DraftData;
+            case "Dome":
+                return ModelFeatureType.DomeData;
 
-                case "EdgeMerge":
-                    return ModelFeatureType.HealEdgesData;
+            case "Draft":
+                return ModelFeatureType.DraftData;
 
-                case "Emboss":
-                    return ModelFeatureType.WrapSketchData;
+            case "EdgeMerge":
+                return ModelFeatureType.HealEdgesData;
 
-                case "Extrusion":
-                    return ModelFeatureType.ExtrudeData;
+            case "Emboss":
+                return ModelFeatureType.WrapSketchData;
 
-                case "Fillet":
-                    return ModelFeatureType.SimpleFilletData;
+            case "Extrusion":
+                return ModelFeatureType.ExtrudeData;
 
-                case "Helix":
-                    return ModelFeatureType.HelixData;
+            case "Fillet":
+                return ModelFeatureType.SimpleFilletData;
 
-                case "HoleSeries":
-                    return ModelFeatureType.HoleSeriesData;
+            case "Helix":
+                return ModelFeatureType.HelixData;
 
-                case "HoleWzd":
-                    return ModelFeatureType.HoleWizardData;
+            case "HoleSeries":
+                return ModelFeatureType.HoleSeriesData;
 
-                // NOTE: No interface
-                case "Imported":
-                    return ModelFeatureType.Imported;
+            case "HoleWzd":
+                return ModelFeatureType.HoleWizardData;
 
-                case "LocalChainPattern":
-                    return ModelFeatureType.ChainPatternData;
+            // NOTE: No interface
+            case "Imported":
+                return ModelFeatureType.Imported;
 
-                case "LocalCirPattern":
-                    return ModelFeatureType.LocalCircularPatternData;
+            case "LocalChainPattern":
+                return ModelFeatureType.ChainPatternData;
 
-                case "LocalCurvePattern":
-                    return ModelFeatureType.LocalCurvePatternData;
+            case "LocalCirPattern":
+                return ModelFeatureType.LocalCircularPatternData;
 
-                case "LocalLPattern":
-                    return ModelFeatureType.LocalLinearPatternData;
+            case "LocalCurvePattern":
+                return ModelFeatureType.LocalCurvePatternData;
 
-                case "LocalSketchPattern":
-                    return ModelFeatureType.LocalSketchPatternData;
+            case "LocalLPattern":
+                return ModelFeatureType.LocalLinearPatternData;
 
-                case "LPattern":
-                    return ModelFeatureType.LinearPatternData;
+            case "LocalSketchPattern":
+                return ModelFeatureType.LocalSketchPatternData;
 
-                case "MacroFeature":
-                    return ModelFeatureType.MacroData;
+            case "LPattern":
+                return ModelFeatureType.LinearPatternData;
 
-                case "MirrorCompFeat":
-                    return ModelFeatureType.MirrorComponentData;
+            case "MacroFeature":
+                return ModelFeatureType.MacroData;
 
-                case "MirrorPattern":
-                    return ModelFeatureType.MirrorPatternData;
+            case "MeshBodyFeature":
+                return ModelFeatureType.GraphicalBody;
 
-                case "MirrorSolid":
-                    return ModelFeatureType.MirrorSolidData;
+            case "MeshFeatureContainer":
+                return ModelFeatureType.GraphicalBodyFeature;
 
-                case "MirrorStock":
-                    return ModelFeatureType.MirrorPartData;
+            case "MirrorCompFeat":
+                return ModelFeatureType.MirrorComponentData;
 
-                case "MoveCopyBody":
-                    return ModelFeatureType.MoveCopyBodyData;
+            case "MirrorPattern":
+                return ModelFeatureType.MirrorPatternData;
 
-                case "NetBlend":
-                    return ModelFeatureType.BoundaryBossData;
+            case "MirrorSolid":
+                return ModelFeatureType.MirrorSolidData;
 
-                // NOTE: No interface
-                case "PrtExploder":
-                    return ModelFeatureType.MultiBodyPartExplodedView;
+            case "MirrorStock":
+                return ModelFeatureType.MirrorPartData;
 
-                case "Punch":
-                    return ModelFeatureType.IndentData;
+            case "MoveCopyBody":
+                return ModelFeatureType.MoveCopyBodyData;
 
-                case "ReplaceFace":
-                    return ModelFeatureType.ReplaceFaceData;
+            case "NetBlend":
+                return ModelFeatureType.BoundaryBossData;
 
-                case "RevCut":
-                    return ModelFeatureType.RevolveData;
+            // NOTE: No interface
+            case "PrtExploder":
+                return ModelFeatureType.MultiBodyPartExplodedView;
 
-                case "Round fillet corner":
-                    return ModelFeatureType.SimpleFilletData;
+            case "Punch":
+                return ModelFeatureType.IndentData;
 
-                case "Revolution":
-                case "RevolutionThin":
-                    return ModelFeatureType.RevolveData;
+            case "ReplaceFace":
+                return ModelFeatureType.ReplaceFaceData;
 
-                case "Rib":
-                    return ModelFeatureType.RibData;
+            case "RevCut":
+                return ModelFeatureType.RevolveData;
 
-                case "Rip":
-                    return ModelFeatureType.RipData;
+            case "Round fillet corner":
+                return ModelFeatureType.SimpleFilletData;
 
-                case "Sculpt":
-                    return ModelFeatureType.IntersectData;
+            case "Revolution":
+            case "RevolutionThin":
+                return ModelFeatureType.RevolveData;
 
-                // NOTE: Obsolete and no interface
-                case "Shape":
-                    return ModelFeatureType.Shape;
+            case "Rib":
+                return ModelFeatureType.RibData;
 
-                case "Shell":
-                    return ModelFeatureType.ShellData;
+            case "Rip":
+                return ModelFeatureType.RipData;
 
-                case "Split":
-                    return ModelFeatureType.SplitBodyData;
+            case "Sculpt":
+                return ModelFeatureType.IntersectData;
 
-                // NOTE: No interface; returned for a body created by splitting a part and saving the body to a part; you cannot access the data of a split body saved to a part
-                case "SplitBody":
-                    return ModelFeatureType.SplitBody;
+            // NOTE: Obsolete and no interface
+            case "Shape":
+                return ModelFeatureType.Shape;
 
-                case "Stock":
-                    return ModelFeatureType.DerivedPartData;
+            case "Shell":
+                return ModelFeatureType.ShellData;
 
-                case "Sweep":
-                case "SweepCut":
-                    return ModelFeatureType.SweepData;
+            case "Split":
+                return ModelFeatureType.SplitBodyData;
 
-                case "SweepThread":
-                    return ModelFeatureType.ThreadData;
+            // NOTE: No interface; returned for a body created by splitting a part and saving the body to a part; you cannot access the data of a split body saved to a part
+            case "SplitBody":
+                return ModelFeatureType.SplitBody;
 
-                case "TablePattern":
-                    return ModelFeatureType.TablePatternData;
+            case "Stock":
+                return ModelFeatureType.DerivedPartData;
 
-                case "Thicken":
-                case "ThickenCut":
-                    return ModelFeatureType.ThickenData;
+            case "Sweep":
+            case "SweepCut":
+                return ModelFeatureType.SweepData;
 
-                case "VarFillet":
-                    return ModelFeatureType.VariableFilletData;
+            case "SweepThread":
+                return ModelFeatureType.ThreadData;
 
-                #endregion
+            case "TablePattern":
+                return ModelFeatureType.TablePatternData;
 
-                #region Drawing
+            case "Thicken":
+            case "ThickenCut":
+                return ModelFeatureType.ThickenData;
 
-                case "BendTableAchor":
-                    return ModelFeatureType.TableAnchor;
+            case "VarFillet":
+                return ModelFeatureType.VariableFilletData;
 
-                case "BomFeat":
-                    return ModelFeatureType.Bom;
+            #endregion
 
-                case "BomTemplate":
-                    return ModelFeatureType.TableAnchor;
+            #region Drawing
 
-                case "DetailCircle":
-                    return ModelFeatureType.DetailCircle;
+            case "BendTableAchor":
+                return ModelFeatureType.TableAnchor;
 
-                case "DrBreakoutSectionLine":
+            case "BomFeat":
+                return ModelFeatureType.Bom;
 
-                    if (feature.SpecificFeature as IBrokenOutSectionFeatureData != null)
-                        return ModelFeatureType.BrokenOutSectionData;
-                    else if (feature.SpecificFeature as IDrSection != null)
-                        return ModelFeatureType.DrSection;
+            case "BomTemplate":
+                return ModelFeatureType.TableAnchor;
 
-                    return ModelFeatureType.None;
+            case "DetailCircle":
+                return ModelFeatureType.DetailCircle;
 
-                case "DrSectionLine":
+            case "DrBreakoutSectionLine":
+
+                if (feature.SpecificFeature is IBrokenOutSectionFeatureData)
+                    return ModelFeatureType.BrokenOutSectionData;
+                if (feature.SpecificFeature is IDrSection)
                     return ModelFeatureType.DrSection;
 
-                case "GeneralTableAnchor":
-                case "HoleTableAnchor":
-                    return ModelFeatureType.TableAnchor;
+                return ModelFeatureType.None;
 
-                case "LiveSection":
-                    return ModelFeatureType.ReferencePlane;
+            case "DrSectionLine":
+                return ModelFeatureType.DrSection;
 
-                case "PunchTableAnchor":
-                case "RevisionTableAnchor":
-                case "WeldmentTableAnchor":
-                case "WeldTableAnchor":
-                    return ModelFeatureType.TableAnchor;
+            case "GeneralTableAnchor":
+            case "HoleTableAnchor":
+                return ModelFeatureType.TableAnchor;
 
-                case "WeldTableFeat":
-                    return ModelFeatureType.WeldTable;
+            case "LiveSection":
+                return ModelFeatureType.ReferencePlane;
 
-                #endregion
+            case "PunchTableAnchor":
+            case "RevisionTableAnchor":
+            case "WeldmentTableAnchor":
+            case "WeldTableAnchor":
+                return ModelFeatureType.TableAnchor;
 
-                #region Folder
+            case "WeldTableFeat":
+                return ModelFeatureType.WeldTable;
 
-                // NOTE: Obsolete and no interface
-                case "BlockFolder":
-                    return ModelFeatureType.BlockFolder;
+            #endregion
 
-                case "CommentsFolder":
-                    return ModelFeatureType.CommentFolder;
+            #region Folder
 
-                case "CosmeticWeldSubFolder":
-                    return ModelFeatureType.CosmeticWeldBeadFolder;
+            // NOTE: Obsolete and no interface
+            case "BlockFolder":
+                return ModelFeatureType.BlockFolder;
 
-                case "CutListFolder":
-                case "FeatSolidBodyFolder":
-                case "FeatSurfaceBodyFolder":
+            case "CommentsFolder":
+                return ModelFeatureType.CommentFolder;
+
+            case "CosmeticWeldSubFolder":
+                return ModelFeatureType.CosmeticWeldBeadFolder;
+
+            case "CutListFolder":
+            case "FeatSolidBodyFolder":
+            case "FeatSurfaceBodyFolder":
+                return ModelFeatureType.BodyFolder;
+
+            case "FtrFolder":
+            case "InsertedFeatureFolder":
+            case "MateReferenceGroupFolder":
+            case "PosGroupFolder":
+            case "ProfileFtrFolder":
+            case "RefAxisFtrFolder":
+            case "RefPlaneFtrFolder":
+            case "SketchSliceFolder":
+                return ModelFeatureType.FeatureFolder;
+
+            case "MeshBodyFeatureFolder":
+            case "SolidBodyFolder":
+            case "SubAtomFolder":
+            case "SubWeldFolder":
+            case "SurfaceBodyFolder":
+
+                // As SubAtomFolder states "IBodyFolder if a body" we double-check here
+                if (feature.SpecificFeature is IBodyFolder)
                     return ModelFeatureType.BodyFolder;
+                return ModelFeatureType.None;
 
-                case "FtrFolder":
-                case "InsertedFeatureFolder":
-                case "MateReferenceGroupFolder":
-                case "PosGroupFolder":
-                case "ProfileFtrFolder":
-                case "RefAxisFtrFolder":
-                case "RefPlaneFtrFolder":
-                case "SketchSliceFolder":
-                    return ModelFeatureType.FeatureFolder;
+            case "TemplateFlatPattern":
+                return ModelFeatureType.FlatPatternFolder;
 
-                case "SolidBodyFolder":
-                case "SubAtomFolder":
-                case "SubWeldFolder":
-                case "SurfaceBodyFolder":
+            #endregion
 
-                    // As SubAtomFolder states "IBodyFolder if a body" we double-check here
-                    if (feature.SpecificFeature as IBodyFolder != null)
-                        return ModelFeatureType.BodyFolder;
-                    else
-                        return ModelFeatureType.None;
+            #region Imported file
 
-                case "TemplateFlatPattern":
-                    return ModelFeatureType.FlatPatternFolder;
+            case "MBimport":
+                return ModelFeatureType.Import3DInterconnectData;
 
-                #endregion
+            #endregion
 
-                #region Imported file
+            #region Miscellaneous
 
-                case "MBimport":
-                    return ModelFeatureType.Import3DInterconnectData;
-                
-                #endregion
+            case "Attribute":
+                return ModelFeatureType.Attribute;
 
-                #region Miscellaneous
+            // NOTE: Obsolete and no interface
+            case "BlockDef":
+                return ModelFeatureType.BlockDef;
 
-                case "Attribute":
-                    return ModelFeatureType.Attribute;
+            case "CurveInFile":
+                return ModelFeatureType.FreePointCurveData;
 
-                // NOTE: Obsolete and no interface
-                case "BlockDef":
-                    return ModelFeatureType.BlockDef;
+            // NOTE: No interface
+            case "GridFeature":
+                return ModelFeatureType.Grid;
 
-                case "CurveInFile":
-                    return ModelFeatureType.FreePointCurveData;
+            case "LibraryFeature":
+                return ModelFeatureType.LibraryFeatureData;
 
-                // NOTE: No interface
-                case "GridFeature":
-                    return ModelFeatureType.Grid;
+            case "Scale":
+                return ModelFeatureType.ScaleData;
 
-                case "LibraryFeature":
-                    return ModelFeatureType.LibraryFeatureData;
+            case "Sensor":
+                return ModelFeatureType.Sensor;
 
-                case "Scale":
-                    return ModelFeatureType.ScaleData;
+            // NOTE: Obsolete
+            case "ViewBodyFeature":
+                return ModelFeatureType.ViewBodyFeature;
 
-                case "Sensor":
-                    return ModelFeatureType.Sensor;
+            #endregion
 
-                // NOTE: Obsolete
-                case "ViewBodyFeature":
-                    return ModelFeatureType.ViewBodyFeature;
+            #region Mold
 
-                #endregion
+            case "Cavity":
+                return ModelFeatureType.CavityData;
 
-                #region Mold
+            case "MoldCoreCavitySolids":
+                return ModelFeatureType.ToolingSplitData;
 
-                case "Cavity":
-                    return ModelFeatureType.CavityData;
+            case "MoldPartingGeom":
+                return ModelFeatureType.PartingSurfaceData;
 
-                case "MoldCoreCavitySolids":
-                    return ModelFeatureType.ToolingSplitData;
+            case "MoldPartLine":
+                return ModelFeatureType.PartingLineData;
 
-                case "MoldPartingGeom":
-                    return ModelFeatureType.PartingSurfaceData;
+            case "MoldShutOffSrf":
+                return ModelFeatureType.ShutOffSurfaceData;
 
-                case "MoldPartLine":
-                    return ModelFeatureType.PartingLineData;
+            case "SideCore":
+                return ModelFeatureType.CoreData;
 
-                case "MoldShutOffSrf":
-                    return ModelFeatureType.ShutOffSurfaceData;
+            case "XformStock":
+                return ModelFeatureType.DerivedPartData;
 
-                case "SideCore":
-                    return ModelFeatureType.CoreData;
+            #endregion
 
-                case "XformStock":
-                    return ModelFeatureType.DerivedPartData;
+            #region Motion and Simulation
 
-                #endregion
+            case "AEM3DContact":
+                return ModelFeatureType.Simulation3DContactData;
 
-                #region Motion and Simulation
+            case "AEMGravity":
+                return ModelFeatureType.SimulationGravityData;
 
-                case "AEM3DContact":
-                    return ModelFeatureType.Simulation3DContactData;
+            case "AEMLinearDamper":
+                return ModelFeatureType.SimulationDamperData;
 
-                case "AEMGravity":
-                    return ModelFeatureType.SimulationGravityData;
+            case "AEMLinearMotor":
+                return ModelFeatureType.SimulationMotorData;
 
-                case "AEMLinearDamper":
-                    return ModelFeatureType.SimulationDamperData;
+            case "AEMLinearSpring":
+                return ModelFeatureType.SimulationLinearSpringData;
 
-                case "AEMLinearMotor":
-                    return ModelFeatureType.SimulationMotorData;
+            case "AEMRotationalMotor":
+                return ModelFeatureType.SimulationMotorData;
 
-                case "AEMLinearSpring":
-                    return ModelFeatureType.SimulationLinearSpringData;
+            case "AEMTorque":
+                return ModelFeatureType.SimulationForceData;
 
-                case "AEMRotationalMotor":
-                    return ModelFeatureType.SimulationMotorData;
+            case "AEMTorsionalDamper":
+                return ModelFeatureType.SimulationDamperData;
 
-                case "AEMTorque":
-                    return ModelFeatureType.SimulationForceData;
+            // NOTE: No interface
+            case "AEMTorsionalSpring":
+                return ModelFeatureType.TorsionalSpring;
 
-                case "AEMTorsionalDamper":
-                    return ModelFeatureType.SimulationDamperData;
+            case "SimPlotFeature":
+                return ModelFeatureType.MotionPlotData;
 
-                // NOTE: No interface
-                case "AEMTorsionalSpring":
-                    return ModelFeatureType.TorsionalSpring;
+            case "SimPlotXAxisFeature":
+            case "SimPlotYAxisFeature":
+                return ModelFeatureType.MotionPlotAxisData;
 
-                case "SimPlotFeature":
-                    return ModelFeatureType.MotionPlotData;
+            case "SimResultFolder":
+                return ModelFeatureType.MotionStudyResults;
 
-                case "SimPlotXAxisFeature":
-                case "SimPlotYAxisFeature":
-                    return ModelFeatureType.MotionPlotAxisData;
+            #endregion
 
-                case "SimResultFolder":
-                    return ModelFeatureType.MotionStudyResults;
+            #region Reference Geometry
 
-                #endregion
+            case "BoundingBox":
+                return ModelFeatureType.BoundingBoxData;
 
-                #region Reference Geometry
+            case "CoordSys":
+                return ModelFeatureType.CoordinateSystemData;
 
-                case "BoundingBox":
-                    return ModelFeatureType.BoundingBoxData;
+            case "GroundPlane":
+                return ModelFeatureType.GroundPlaneData;
 
-                case "CoordSys":
-                    return ModelFeatureType.CoordinateSystemData;
+            case "RefAxis":
 
-                case "GroundPlane":
-                    return ModelFeatureType.GroundPlaneData;
+                if (feature.SpecificFeature is IRefAxisFeatureData)
+                    return ModelFeatureType.ReferenceAxisData;
+                if (feature.SpecificFeature is IRefAxis)
+                    return ModelFeatureType.ReferenceAxis;
+                return ModelFeatureType.None;
 
-                case "RefAxis":
+            case "RefPlane":
+                return ModelFeatureType.ReferencePlaneData;
 
-                    if (feature.SpecificFeature as IRefAxisFeatureData != null)
-                        return ModelFeatureType.ReferenceAxisData;
-                    else if (feature.SpecificFeature as IRefAxis != null)
-                        return ModelFeatureType.ReferenceAxis;
-                    else
-                        return ModelFeatureType.None;
+            #endregion
 
-                case "RefPlane":
-                    return ModelFeatureType.ReferencePlaneData;
+            #region Scenes, Lights, Cameras
 
-                #endregion
+            case "AmbientLight":
+                return ModelFeatureType.Light;
 
-                #region Scenes, Lights, Cameras
+            case "CameraFeature":
+                return ModelFeatureType.Camera;
 
-                case "AmbientLight":
-                    return ModelFeatureType.Light;
+            case "DirectionLight":
+            case "PointLight":
+            case "SpotLight":
+                return ModelFeatureType.Light;
 
-                case "CameraFeature":
-                    return ModelFeatureType.Camera;
+            #endregion
 
-                case "DirectionLight":
-                case "PointLight":
-                case "SpotLight":
-                    return ModelFeatureType.Light;
+            #region Sheet Metal
 
-                #endregion
+            case "SMBaseFlange":
+                return ModelFeatureType.BaseFlangeData;
 
-                #region Sheet Metal
+            case "BreakCorner":
+            case "CornerTrim":
+                return ModelFeatureType.BreakCornerData;
 
-                case "SMBaseFlange":
-                    return ModelFeatureType.BaseFlangeData;
+            case "CrossBreak":
+                return ModelFeatureType.CrossBreakData;
 
-                case "BreakCorner":
-                case "CornerTrim":
-                    return ModelFeatureType.BreakCornerData;
+            case "EdgeFlange":
+                return ModelFeatureType.EdgeFlangeData;
 
-                case "CrossBreak":
-                    return ModelFeatureType.CrossBreakData;
+            case "FlatPattern":
+                return ModelFeatureType.FlatPatternData;
 
-                case "EdgeFlange":
-                    return ModelFeatureType.EdgeFlangeData;
+            case "FlattenBends":
+                return ModelFeatureType.BendsData;
 
-                case "FlatPattern":
-                    return ModelFeatureType.FlatPatternData;
+            case "Fold":
+                return ModelFeatureType.FoldsData;
 
-                case "FlattenBends":
-                    return ModelFeatureType.BendsData;
+            // NOTE: No interface
+            case "FormToolInstance":
+                return ModelFeatureType.FormTool;
 
-                case "Fold":
-                    return ModelFeatureType.FoldsData;
+            case "Hem":
+                return ModelFeatureType.HemData;
 
-                // NOTE: No interface
-                case "FormToolInstance":
-                    return ModelFeatureType.FormTool;
+            case "Jog":
+                return ModelFeatureType.JogData;
 
-                case "Hem":
-                    return ModelFeatureType.HemData;
+            case "LoftedBend":
+                return ModelFeatureType.LoftedBendsData;
 
-                case "Jog":
-                    return ModelFeatureType.JogData;
+            case "NormalCut":
+                return ModelFeatureType.NormalCutData;
 
-                case "LoftedBend":
-                    return ModelFeatureType.LoftedBendsData;
+            case "OneBend":
+                return ModelFeatureType.OneBendData;
 
-                case "NormalCut":
-                    return ModelFeatureType.NormalCutData;
+            case "ProcessBends":
+                return ModelFeatureType.BendsData;
 
-                case "OneBend":
-                    return ModelFeatureType.OneBendData;
+            case "SheetMetal":
+                return ModelFeatureType.SheetMetalData;
 
-                case "ProcessBends":
-                    return ModelFeatureType.BendsData;
+            case "SketchBend":
+                return ModelFeatureType.OneBendData;
 
-                case "SheetMetal":
-                    return ModelFeatureType.SheetMetalData;
+            case "SM3dBend":
+                return ModelFeatureType.SketchedBendData;
 
-                case "SketchBend":
-                    return ModelFeatureType.OneBendData;
+            case "SMGusset":
+                return ModelFeatureType.SheetMetalGussetData;
 
-                case "SM3dBend":
-                    return ModelFeatureType.SketchedBendData;
+            case "SMMiteredFlange":
+                return ModelFeatureType.MiterFlangeData;
 
-                case "SMGusset":
-                    return ModelFeatureType.SheetMetalGussetData;
+            // According to the help, SolidWorks 2017 and newer return a SheetMetalFolder, even though that interface exists since 2014
+            case "TemplateSheetMetal":
+                return VersionYear < 2017 ? ModelFeatureType.SheetMetalData : ModelFeatureType.SheetMetalFolder;
 
-                case "SMMiteredFlange":
-                    return ModelFeatureType.MiterFlangeData;
+            case "ToroidalBend":
+                return ModelFeatureType.OneBendData;
 
-                // According to the help, SolidWorks 2017 and newer return a SheetMetalFolder, even though that interface exists since 2014
-                case "TemplateSheetMetal":
-                    return VersionYear < 2017 ? ModelFeatureType.SheetMetalData : ModelFeatureType.SheetMetalFolder;
+            case "UnFold":
+                return ModelFeatureType.FoldsData;
 
-                case "ToroidalBend":
-                    return ModelFeatureType.OneBendData;
+            #endregion
 
-                case "UnFold":
-                    return ModelFeatureType.FoldsData;
+            #region Sketch
 
-                #endregion
+            case "3DProfileFeature":
+                return ModelFeatureType.Sketch;
 
-                #region Sketch
+            case "3DSplineCurve":
 
-                case "3DProfileFeature":
-                    return ModelFeatureType.Sketch;
+                if (feature.SpecificFeature is IReferencePointCurveFeatureData)
+                    return ModelFeatureType.ReferencePointCurveData;
+                if (feature.SpecificFeature is IReferenceCurve)
+                    return ModelFeatureType.ReferenceCurve;
+                return ModelFeatureType.None;
 
-                case "3DSplineCurve":
+            case "CompositeCurve":
 
-                    if (feature.SpecificFeature as IReferencePointCurveFeatureData != null)
-                        return ModelFeatureType.ReferencePointCurveData;
-                    if (feature.SpecificFeature as IReferenceCurve != null)
-                        return ModelFeatureType.ReferenceCurve;
-                    else
-                        return ModelFeatureType.None;
+                if (feature.SpecificFeature is ICompositeCurveFeatureData)
+                    return ModelFeatureType.CompositeCurveData;
+                if (feature.SpecificFeature is IReferenceCurve)
+                    return ModelFeatureType.ReferenceCurve;
+                return ModelFeatureType.None;
 
-                case "CompositeCurve":
+            case "ImportedCurve":
 
-                    if (feature.SpecificFeature as ICompositeCurveFeatureData != null)
-                        return ModelFeatureType.CompositeCurveData;
-                    else if (feature.SpecificFeature as IReferenceCurve != null)
-                        return ModelFeatureType.ReferenceCurve;
-                    else
-                        return ModelFeatureType.None;
+                if (feature.SpecificFeature is IImportedCurveFeatureData)
+                    return ModelFeatureType.ImportedCurveData;
+                if (feature.SpecificFeature is IReferenceCurve)
+                    return ModelFeatureType.ReferenceCurve;
+                return ModelFeatureType.None;
 
-                case "ImportedCurve":
+            case "PLine":
+                return ModelFeatureType.SplitLineData;
 
-                    if (feature.SpecificFeature as IImportedCurveFeatureData != null)
-                        return ModelFeatureType.ImportedCurveData;
-                    else if (feature.SpecificFeature as IReferenceCurve != null)
-                        return ModelFeatureType.ReferenceCurve;
-                    else
-                        return ModelFeatureType.None;
+            case "ProfileFeature":
+                return ModelFeatureType.Sketch;
 
-                case "PLine":
-                    return ModelFeatureType.SplitLineData;
+            case "RefCurve":
 
-                case "ProfileFeature":
-                    return ModelFeatureType.Sketch;
+                if (feature.SpecificFeature is IProjectionCurveFeatureData)
+                    return ModelFeatureType.ProjectionCurveData;
+                if (feature.SpecificFeature is IReferenceCurve)
+                    return ModelFeatureType.ReferenceCurve;
+                return ModelFeatureType.None;
 
-                case "RefCurve":
+            case "SketchBlockDef":
+                return ModelFeatureType.SketchBlockDefinition;
 
-                    if (feature.SpecificFeature as IProjectionCurveFeatureData != null)
-                        return ModelFeatureType.ProjectionCurveData;
-                    else if (feature.SpecificFeature as IReferenceCurve != null)
-                        return ModelFeatureType.ReferenceCurve;
-                    else
-                        return ModelFeatureType.None;
+            case "SketchBlockInst":
+                return ModelFeatureType.SketchBlockInstance;
 
-                case "SketchBlockDef":
-                    return ModelFeatureType.SketchBlockDefinition;
+            case "SketchHole":
+                return ModelFeatureType.SimpleHoleData;
 
-                case "SketchBlockInst":
-                    return ModelFeatureType.SketchBlockInstance;
+            case "SketchPattern":
+                return ModelFeatureType.SketchPatternData;
 
-                case "SketchHole":
-                    return ModelFeatureType.SimpleHoleData;
+            case "SketchBitmap":
+                return ModelFeatureType.SketchPicture;
 
-                case "SketchPattern":
-                    return ModelFeatureType.SketchPatternData;
+            #endregion
 
-                case "SketchBitmap":
-                    return ModelFeatureType.SketchPicture;
+            #region Surface
 
-                #endregion
+            // NOTE: No interface
+            case "BlendRefSurface":
+                return ModelFeatureType.SurfaceLoft;
 
-                #region Surface
+            case "ExtendRefSurface":
+                return ModelFeatureType.SurfaceExtendData;
 
-                // NOTE: No interface
-                case "BlendRefSurface":
-                    return ModelFeatureType.SurfaceLoft;
+            case "ExtruRefSurface":
+                return ModelFeatureType.SurfaceExtrudeData;
 
-                case "ExtendRefSurface":
-                    return ModelFeatureType.SurfaceExtendData;
+            case "FillRefSurface":
+                return ModelFeatureType.SurfaceFillData;
 
-                case "ExtruRefSurface":
-                    return ModelFeatureType.SurfaceExtrudeData;
+            case "FlattenSurface":
+                return ModelFeatureType.SurfaceFlattenData;
 
-                case "FillRefSurface":
-                    return ModelFeatureType.SurfaceFillData;
+            case "MidRefSurface":
+                return ModelFeatureType.SurfaceMid;
 
-                case "FlattenSurface":
-                    return ModelFeatureType.SurfaceFlattenData;
+            case "OffsetRefSuface":
+                return ModelFeatureType.SurfaceOffsetData;
 
-                case "MidRefSurface":
-                    return ModelFeatureType.SurfaceMid;
+            case "PlanarSurface":
+                return ModelFeatureType.SurfacePlanarData;
 
-                case "OffsetRefSuface":
-                    return ModelFeatureType.SurfaceOffsetData;
+            case "RadiateRefSurface":
+                return ModelFeatureType.SurfaceRadiateData;
 
-                case "PlanarSurface":
-                    return ModelFeatureType.SurfacePlanarData;
+            // NOTE: No interface
+            case "RefSurface":
+                return ModelFeatureType.SurfaceImported;
 
-                case "RadiateRefSurface":
-                    return ModelFeatureType.SurfaceRadiateData;
+            case "RevolvRefSurf":
+                return ModelFeatureType.SurfaceRevolveData;
 
-                // NOTE: No interface
-                case "RefSurface":
-                    return ModelFeatureType.SurfaceImported;
+            case "RuledSrfFromEdge":
+                return ModelFeatureType.SurfaceRuledData;
 
-                case "RevolvRefSurf":
-                    return ModelFeatureType.SurfaceRevolveData;
+            case "SewRefSurface":
+                return ModelFeatureType.SurfaceKnitData;
 
-                case "RuledSrfFromEdge":
-                    return ModelFeatureType.SurfaceRuledData;
+            case "SurfCut":
+                return ModelFeatureType.SurfaceCutData;
 
-                case "SewRefSurface":
-                    return ModelFeatureType.SurfaceKnitData;
+            // NOTE: No interface until 2018
+            case "SweepRefSurface":
+                return ModelFeatureType.SurfaceSweepData;
 
-                case "SurfCut":
-                    return ModelFeatureType.SurfaceCutData;
+            case "TrimRefSurface":
+                return ModelFeatureType.SurfaceTrimData;
 
-                // NOTE: No interface until 2018
-                case "SweepRefSurface":
-                    return ModelFeatureType.SurfaceSweepData;
+            // NOTE: No interface
+            case "UnTrimRefSurf":
+                return ModelFeatureType.SurfaceUntrim;
 
-                case "TrimRefSurface":
-                    return ModelFeatureType.SurfaceTrimData;
+            #endregion
 
-                // NOTE: No interface
-                case "UnTrimRefSurf":
-                    return ModelFeatureType.SurfaceUntrim;
+            #region Weldment
 
-                #endregion
+            case "CosmeticWeldBead":
+                return ModelFeatureType.CosmeticWeldBeadData;
 
-                #region Weldment
+            case "EndCap":
+                return ModelFeatureType.EndCapData;
 
-                case "CosmeticWeldBead":
-                    return ModelFeatureType.CosmeticWeldBeadData;
+            case "Gusset":
+                return ModelFeatureType.GussetData;
 
-                case "EndCap":
-                    return ModelFeatureType.EndCapData;
+            case "Weldment":
+                return ModelFeatureType.Weldment;
 
-                case "Gusset":
-                    return ModelFeatureType.GussetData;
+            case "WeldBeadFeat":
+                return ModelFeatureType.WeldmentBeadData;
 
-                case "Weldment":
-                    return ModelFeatureType.Weldment;
+            case "WeldCornerFeat":
+                return ModelFeatureType.WeldmentTrimExtendData;
 
-                case "WeldBeadFeat":
-                    return ModelFeatureType.WeldmentBeadData;
+            case "WeldMemberFeat":
+                return ModelFeatureType.WeldmentMemberData;
 
-                case "WeldCornerFeat":
-                    return ModelFeatureType.WeldmentTrimExtendData;
+            case "WeldmentTableFeat":
+                return ModelFeatureType.WeldmentCutListData;
 
-                case "WeldMemberFeat":
-                    return ModelFeatureType.WeldmentMemberData;
+            #endregion
 
-                case "WeldmentTableFeat":
-                    return ModelFeatureType.WeldmentCutListData;
-
-                #endregion
-
-                default:
-                    return ModelFeatureType.None;
-            }
+            default:
+                return ModelFeatureType.None;
         }
-
-        /// <summary>
-        /// Helper property to get the SOLIDWORKS version year.
-        /// If unknown will return -1.
-        /// </summary>
-        private static int VersionYear => SolidWorksEnvironment.Application.SolidWorksVersion.Version;
     }
+
+    /// <summary>
+    /// Helper property to get the SOLIDWORKS version year.
+    /// If unknown will return -1.
+    /// </summary>
+    private static int VersionYear => SolidWorksEnvironment.Application.SolidWorksVersion.Version;
 }

@@ -1,39 +1,37 @@
-﻿namespace CADBooster.SolidDna
+﻿namespace CADBooster.SolidDna;
+
+/// <summary>
+/// A blank AddIn class that is used when registering our add-in with COM.
+/// </summary>
+public class BlankSolidAddIn : SolidAddIn
 {
+    #region Constructor
+
     /// <summary>
-    /// Creates a blank AddIn integration class
+    /// Default constructor
     /// </summary>
-    public class BlankSolidAddIn : SolidAddIn
+    public BlankSolidAddIn()
     {
-        #region Constructor
-
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        public BlankSolidAddIn() : base()
-        {
-
-        }
-
-        #endregion
-
-        #region AddIn Methods
-
-        public override void ApplicationStartup()
-        {
-
-        }
-
-        public override void PreConnectToSolidWorks()
-        {
-
-        }
-
-        public override void PreLoadPlugIns()
-        {
-
-        }
-
-        #endregion
     }
+
+    #endregion
+
+    #region AddIn Methods
+
+    /// <inheritdoc />
+    public override void ApplicationStartup()
+    {
+    }
+
+    /// <inheritdoc />
+    public override void PreConnectToSolidWorks()
+    {
+    }
+
+    /// <inheritdoc />
+    public override void PreLoadPlugIns()
+    {
+    }
+
+    #endregion
 }
