@@ -42,22 +42,23 @@ public abstract class CommandContextBase
     /// <summary>
     /// The action to call when the item state requested
     /// </summary>
-    public Action<CommandManagerItemStateCheckArgs> OnStateCheck { get; set; }
+    public abstract Action<CommandManagerItemStateCheckArgs> OnStateCheck { get; set; }
 
     /// <summary>
-    /// The selection type that determines where the context menu will be shown
+    /// The selection type that determines with which selection context the item will be shown
     /// </summary>
     public SelectionType SelectionType { get; set; } = SelectionType.Everything;
 
     #endregion
 
     /// <summary>
-    /// Creates the command context item for the specified document types
+    /// Creates the command context item for the specified document types in derived classes.
+    /// The base class only implements restriction of multiple creation; it does not create anything.
     /// </summary>
-    /// <param name="path">The path to use for hierarchical naming. If empty, the item's name is used</param>
-    /// <returns>A list of created command context items</returns>
+    /// <param name="info">Create information containing cookie and other context</param>
+    /// <returns>Base class method returns empty enumerable</returns>
     /// <exception cref="SolidDnaException">Thrown if the item has already been created</exception>
-    public virtual IEnumerable<ICommandCreated> Create(string path = "")
+    public virtual IEnumerable<ICommandCreated> Create(ICommandContextCreateInfo info)
     {
         if (_isCreated)
             throw new SolidDnaException(

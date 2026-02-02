@@ -11,7 +11,7 @@ internal abstract class CommandContextCreatedBase : ICommandCreated, ICommandIte
     public string CallbackId { get; } = Guid.NewGuid().ToString("N");
 
     /// <summary>
-    /// Gets the name of this command context item
+    /// Gets the name for identification of this command context item
     /// </summary>
     public abstract string Name { get; }
 
@@ -40,6 +40,8 @@ internal abstract class CommandContextCreatedBase : ICommandCreated, ICommandIte
     /// </summary>
     public Action<CommandManagerItemStateCheckArgs> OnStateCheck { get; private set; }
 
+    private bool _isDisposed = false;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="CommandContextItemCreated"/> class
     /// </summary>
@@ -48,7 +50,12 @@ internal abstract class CommandContextCreatedBase : ICommandCreated, ICommandIte
     /// <param name="documentType">The document type (Assembly, Part, or Drawing) for which this item is created</param>
     public CommandContextCreatedBase(CommandContextBase commandContextBase, DocumentType documentType)
     {
-        Hint = commandContextBase.Hint;
+        if (commandContextBase is null)
+            throw new SolidDnaException(
+                SolidDnaErrors.CreateError(SolidDnaErrorTypeCode.SolidWorksCommandManager,
+                    SolidDnaErrorCode.SolidWorksCommandManagerError,
+                    "Command context base cannot be null"));
+
         OnClick = commandContextBase.OnClick;
         OnStateCheck = commandContextBase.OnStateCheck;
         SelectionType = commandContextBase.SelectionType;
@@ -85,6 +92,15 @@ internal abstract class CommandContextCreatedBase : ICommandCreated, ICommandIte
         if (CallbackId != args.CallbackId)
             return;
 
+        // Removal/Dispose strategy:
+        // SolidWorks provides no reliable way to remove context menu items/icons once registered.
+        // So "Dispose" in SolidDNA means: keep the state-check callback active and force Hidden.
+        if (_isDisposed)
+        {
+            args.Result = CommandManagerItemState.Hidden;
+            return;
+        }
+
         // Call the action
         OnStateCheck?.Invoke(args);
     }
@@ -92,7 +108,7 @@ internal abstract class CommandContextCreatedBase : ICommandCreated, ICommandIte
     /// <summary>
     /// Disposing
     /// </summary>
-    public void Dispose()
+    public virtual void Dispose()
     {
         /// I can't find the way to remove the item
 
@@ -120,6 +136,12 @@ internal abstract class CommandContextCreatedBase : ICommandCreated, ICommandIte
 
         // Stop listening out for callbacks
         PlugInIntegration.CallbackFired -= PlugInIntegration_CallbackFired;
-        PlugInIntegration.ItemStateCheckFired -= PlugInIntegration_EnableMethodFired;
+
+        // NOTE: We intentionally do not unsubscribe from ItemStateCheckFired.
+        // We need to keep receiving state checks so we can return Hidden after disposal,
+        // because SolidWorks does not reliably support removing registered context entries.
+        // PlugInIntegration.ItemStateCheckFired -= PlugInIntegration_EnableMethodFired;
+
+        _isDisposed = true;
     }
 }
