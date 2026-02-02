@@ -1070,7 +1070,17 @@ public class ModelFeature : SharedSolidDnaObject<Feature>, IModelFeature
     /// Gets the SolidWorks feature type name, such as RefSurface, CosmeticWeldBead, FeatSurfaceBodyFolder etc...
     /// </summary>
     /// <returns></returns>
-    protected string GetFeatureTypeName() => BaseObject.GetTypeName2(); // TODO: Handle Intant3D feature, then call GetTypeName instead of 2
+    protected string GetFeatureTypeName()
+    {
+        var type2 = BaseObject.GetTypeName2();
+
+        // For Instant3D feature (i.e., "ICE") SolidWorks returns generic "ICE" value
+        // If it returned we handeld ot and call GetTypeName()
+        // Docs:
+        // https://help.solidworks.com/2022/english/api/sldworksapi/solidworks.interop.sldworks~solidworks.interop.sldworks.ifeature~gettypename.html
+        // https://help.solidworks.com/2026/english/api/sldworksapi/SOLIDWORKS.Interop.sldworks~SOLIDWORKS.Interop.sldworks.IFeature~GetTypeName2.html
+        return type2 == "ICE" ? BaseObject.GetTypeName() : type2;
+    }
 
     #endregion
 
