@@ -1,4 +1,4 @@
-﻿using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System;
 using System.Collections.Generic;
@@ -752,6 +752,17 @@ public class SelectionType
     /// </summary>
     private readonly string[] _customFeatureNames = [];
 
+    /// <summary>
+    /// Indicates whether this selection type represents a specific feature type (e.g., "SketchHole", "Boss").
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// When <c>true</c>, this <see cref="SelectionType"/> targets a specific SolidWorks feature type 
+    /// identified by <see cref="SolidWorks.Interop.sldworks.IFeature.GetTypeName2"/>.
+    /// </para>
+    /// </remarks>
+    public bool IsSpecificFeatureType { get; }
+
     #endregion
 
     #region Constructor
@@ -763,10 +774,11 @@ public class SelectionType
     /// <param name="enumValue">The numeric identifier for the selection type.</param>
     /// <param name="stringValue">The string representation used in the SOLIDWORKS API.</param>
     /// <remarks> Custom feature types should use <see cref="CreateCustomFeatureType(SelectionType, string)"/> instead.</remarks>
-    internal SelectionType(swSelectType_e enumValue, string stringValue)
+    internal SelectionType(swSelectType_e enumValue, string stringValue, bool isFeatureSpecific = false)
     {
         EnumValue = enumValue;
         StringValue = stringValue;
+        IsSpecificFeatureType = isFeatureSpecific;
     }
 
     /// <summary>
@@ -810,13 +822,10 @@ public class SelectionType
     /// <param name="baseType"></param>
     /// <param name="featureNames">An array of custom feature names.</param>
     /// <returns>A new <see cref="SelectionType"/> instance.</returns>
-        /// <example>
-        /// var customTypes = SelectionType.CreateCustomFeatureType(new[] { "MyAwesomeFeature1", "MyAwesomeFeature2" });
-        /// </example>
     /// <remarks>
     /// Can be used with <see cref="SelectionType.Attribute"/>
     /// </remarks>
-    public static SelectionType CreateCustomFeatureType(SelectionType baseType, List<string> featureNames) => new SelectionType(baseType, featureNames);
+    public static SelectionType CreateCustomFeatureType(SelectionType baseType, IEnumerable<string> featureNames) => new SelectionType(baseType, featureNames);
 
     /// <summary>
     /// Get a semicolon-separated string of custom feature names (if applicable).
