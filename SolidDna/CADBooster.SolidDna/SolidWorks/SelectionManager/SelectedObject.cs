@@ -26,23 +26,7 @@ public class SelectedObject : SolidDnaObject<object>, ISelectedObject
     /// True if this object is a feature.
     /// From the feature you can check the specific feature type and get the specific feature from that.
     /// </summary>
-    public bool IsFeature => ObjectType == swSelectType_e.swSelDATUMPLANES ||
-                             ObjectType == swSelectType_e.swSelDATUMAXES ||
-                             ObjectType == swSelectType_e.swSelDATUMPOINTS ||
-                             ObjectType == swSelectType_e.swSelATTRIBUTES ||
-                             ObjectType == swSelectType_e.swSelSKETCHES ||
-                             ObjectType == swSelectType_e.swSelSECTIONLINES ||
-                             ObjectType == swSelectType_e.swSelDETAILCIRCLES ||
-                             ObjectType == swSelectType_e.swSelMATES ||
-                             ObjectType == swSelectType_e.swSelBODYFEATURES ||
-                             ObjectType == swSelectType_e.swSelREFCURVES ||
-                             ObjectType == swSelectType_e.swSelREFERENCECURVES ||
-                             ObjectType == swSelectType_e.swSelCTHREADS ||
-                             ObjectType == swSelectType_e.swSelCONFIGURATIONS ||
-                             ObjectType == swSelectType_e.swSelREFSILHOUETTE ||
-                             ObjectType == swSelectType_e.swSelCAMERAS ||
-                             ObjectType == swSelectType_e.swSelSWIFTANNOTATIONS ||
-                             ObjectType == swSelectType_e.swSelSWIFTFEATURES;
+    public bool IsFeature => BaseObject as Feature is not null;
 
     /// <summary>
     /// True if this object is a dimension.
