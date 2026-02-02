@@ -14,7 +14,7 @@ public class ModelExtension : SolidDnaObject<ModelDocExtension>
     /// <summary>
     /// The parent Model for this extension
     /// </summary>
-    public Model Parent { get; set; }
+    public IModel Parent { get; set; }
 
     #endregion
 
@@ -23,7 +23,7 @@ public class ModelExtension : SolidDnaObject<ModelDocExtension>
     /// <summary>
     /// Default constructor
     /// </summary>
-    public ModelExtension(ModelDocExtension model, Model parent) : base(model)
+    public ModelExtension(ModelDocExtension model, IModel parent) : base(model)
     {
         Parent = parent;
     }

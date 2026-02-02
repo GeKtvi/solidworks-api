@@ -6,7 +6,7 @@ using System.Linq;
 namespace CADBooster.SolidDna;
 
 /// <summary>
-/// Exposes all Assembly Document calls from a <see cref="Model"/>.
+/// Exposes all Assembly Document calls from a <see cref="IModel"/>.
 /// Is not a SolidDna{T} object because the lifecycle is handled by the parent Model.
 /// </summary>
 public class AssemblyDocument : IAssemblyDocument
@@ -121,7 +121,7 @@ public class AssemblyDocument : IAssemblyDocument
 
     /// <summary>
     /// Set the configuration for a file that was just dropped into the assembly.
-    /// Use this method after receiving a <see cref="Model.FileDropped"/> event to set the configuration name of the dropped model.
+    /// Use this method after receiving a <see cref="IModel.FileDropped"/> event to set the configuration name of the dropped model.
     /// </summary>
     /// <param name="configurationName">The configuration name that the dropped component should use</param>
     /// <returns>True if successful</returns>

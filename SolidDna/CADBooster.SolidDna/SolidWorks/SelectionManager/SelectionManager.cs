@@ -42,7 +42,7 @@ public class SelectionManager : SolidDnaObject<SelectionMgr>, ISelectionManager
     #endregion
 
     private readonly List<IDisposable> _disposables = new List<IDisposable>();
-    private readonly Model _model;
+    private readonly IModel _model;
     private readonly ModelExtension _modelExtension;
 
     /// <summary>
@@ -60,7 +60,7 @@ public class SelectionManager : SolidDnaObject<SelectionMgr>, ISelectionManager
     /// <param name="manager">The SolidWorks selection manager</param>
     /// <param name="model">The parent model</param>
     /// <param name="modelExtension">The parent model extension</param>
-    public SelectionManager(SelectionMgr manager, Model model, ModelExtension modelExtension) : base(manager)
+    public SelectionManager(SelectionMgr manager, IModel model, ModelExtension modelExtension) : base(manager)
     {
         _model = model;
         _modelExtension = modelExtension;

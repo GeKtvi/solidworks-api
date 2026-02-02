@@ -3,7 +3,7 @@
 namespace CADBooster.SolidDna;
 
 /// <summary>
-/// The options from a <see cref="Model.PackAndGo(string, string)"/> call,
+/// The options from a <see cref="IModel.PackAndGo(string, string)"/> call,
 /// from <see cref="swPackAndGoSaveStatus_e"/>
 /// </summary>
 public enum PackAndGoSaveStatus

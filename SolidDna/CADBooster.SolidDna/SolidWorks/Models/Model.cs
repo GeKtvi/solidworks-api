@@ -235,7 +235,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
             {
                 // If no output path specified...
                 if (outputFolder.IsNullOrEmpty())
-                    // Set it to app data folder
+                // Set it to app data folder
                 {
                     outputFolder = Path.Combine(
                         System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),

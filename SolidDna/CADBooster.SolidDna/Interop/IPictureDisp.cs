@@ -8,7 +8,7 @@ namespace CADBooster.SolidDna.Interop;
 
 /// <summary>
 /// The picture disp interface from the stdole library.
-/// Used for getting preview images from SolidWorks using <see cref="SolidWorksApplication.GetPreviewBitmap"/> or <see cref="Model.GetPreviewBitmap"/>
+/// Used for getting preview images from SolidWorks using <see cref="SolidWorksApplication.GetPreviewBitmap"/> or <see cref="IModel.GetPreviewBitmap"/>
 /// </summary>
 [ComImport]
 [Guid("7BF80981-BF32-101A-8BBB-00AA00300CAB")]

@@ -22,7 +22,7 @@ public class Component : SolidDnaObject<Component2>, IComponent
     /// To make sure you get features and other objects from the correct configuration, open the component in its own window and activate the configuration.
     /// See https://help.solidworks.com/2026/english/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.IComponent2~GetModelDoc2.html.
     /// </summary>
-    public Model AsModel
+    public IModel AsModel
     {
         get
         {
@@ -431,7 +431,7 @@ public class Component : SolidDnaObject<Component2>, IComponent
     /// Get the assembly that owns this component. A bit hacky but it works.
     /// </summary>
     /// <returns></returns>
-    public Model GetParentAssembly()
+    public IModel GetParentAssembly()
     {
         // Get the string to select this component. The string ends with the name of the root assembly
         var selectByIdString = BaseObject.GetSelectByIDString();

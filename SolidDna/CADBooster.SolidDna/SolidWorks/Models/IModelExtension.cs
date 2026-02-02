@@ -14,7 +14,7 @@ public interface IModelExtension : IDisposable
     /// <summary>
     /// The parent Model for this extension
     /// </summary>
-    Model Parent { get; set; }
+    IModel Parent { get; set; }
 
     /// <summary>
     /// The raw underlying COM object.

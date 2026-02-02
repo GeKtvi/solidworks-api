@@ -4,7 +4,7 @@ using System;
 namespace CADBooster.SolidDna;
 
 /// <summary>
-/// Exposes all Part Document calls from a <see cref="Model"/>
+/// Exposes all Part Document calls from a <see cref="IModel"/>
 /// Is not a SolidDna{T} object because the lifecycle is handled by the parent Model.
 /// </summary>
 public class PartDocument : IPartDocument

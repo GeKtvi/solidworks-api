@@ -63,10 +63,10 @@ public class ModelDimension : SolidDnaObject<IDimension>
         _featureOwner = new Lazy<ModelFeature>(() => new ModelFeature(BaseObject.GetFeatureOwner()));
     }
 
-    public double GetUserValueIn(Model doc)
+    public double GetUserValueIn(IModel doc)
         => BaseObject.IGetUserValueIn2(doc.UnsafeObject);
 
-    public SetValueReturnStatus SetUserValueIn(Model doc, double newValue, ConfigurationOptions whichConfigurations)
+    public SetValueReturnStatus SetUserValueIn(IModel doc, double newValue, ConfigurationOptions whichConfigurations)
         => (SetValueReturnStatus)BaseObject.ISetUserValueIn3(doc.UnsafeObject, newValue, (int)whichConfigurations);
 
     // TODO: check is inprocess method works from CLR

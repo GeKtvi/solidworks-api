@@ -17,7 +17,7 @@ public static class ModelExtensions
     /// </summary>
     /// <param name="model">The SolidWorks model</param>
     /// <returns>Enumerable of raw annotation objects</returns>
-    public static IEnumerable<Annotation> EnumerateUnsafeAnnotations(this Model model)
+    public static IEnumerable<Annotation> EnumerateUnsafeAnnotations(this IModel model)
     {
         var annotation = model.UnsafeObject.IGetFirstAnnotation2();
 
@@ -34,7 +34,7 @@ public static class ModelExtensions
     /// <param name="model">The SolidWorks model</param>
     /// <param name="disposable">Container for disposable management</param>
     /// <returns>Enumerable of wrapped notes</returns>
-    public static IEnumerable<Note> EnumerateNotes(this Model model, ICompositeDisposable disposable)
+    public static IEnumerable<Note> EnumerateNotes(this IModel model, ICompositeDisposable disposable)
         => model
             .EnumerateUnsafeAnnotations()
             .EnumerateNotes(disposable);
@@ -80,7 +80,7 @@ public static class ModelExtensions
     /// </summary>
     /// <param name="model">The SolidWorks model</param>
     /// <returns>Enumerable of raw feature objects</returns>
-    public static IEnumerable<Feature> EnumerateUnsafeFeatures(this Model model)
+    public static IEnumerable<Feature> EnumerateUnsafeFeatures(this IModel model)
     {
         var feature = model.UnsafeObject.FirstFeature();
 
@@ -98,7 +98,7 @@ public static class ModelExtensions
     /// <param name="model">The SolidWorks model</param>
     /// <param name="disposable">Container for disposable management</param>
     /// <returns>Enumerable of wrapped features</returns>
-    public static IEnumerable<ModelFeature> EnumerateFeatures(this Model model, ICompositeDisposable disposable = null)
+    public static IEnumerable<ModelFeature> EnumerateFeatures(this IModel model, ICompositeDisposable disposable = null)
         => model
             .EnumerateUnsafeFeatures()
             .WrapDnaObject(disposable.GetDummyIfNull());

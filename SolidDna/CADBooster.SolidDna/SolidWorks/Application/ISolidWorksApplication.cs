@@ -18,7 +18,7 @@ public interface ISolidWorksApplication : IDisposable
     /// <summary>
     /// The currently active model
     /// </summary>
-    Model ActiveModel { get; }
+    IModel ActiveModel { get; }
 
     /// <summary>
     /// The type of SolidWorks application that is currently running.
@@ -69,22 +69,22 @@ public interface ISolidWorksApplication : IDisposable
     /// <summary>
     /// Called when the currently active file has been saved
     /// </summary>
-    event Action<string, Model> ActiveFileSaved;
+    event Action<string, IModel> ActiveFileSaved;
 
     /// <summary>
     /// Called when any information about the currently active model has changed
     /// </summary>
-    event Action<Model> ActiveModelInformationChanged;
+    event Action<IModel> ActiveModelInformationChanged;
 
     /// <summary>
     /// Called when a new file has been created
     /// </summary>
-    event Action<Model> FileCreated;
+    event Action<IModel> FileCreated;
 
     /// <summary>
     /// Called when a file has been opened
     /// </summary>
-    event Action<string, Model> FileOpened;
+    event Action<string, IModel> FileOpened;
 
     /// <summary>
     /// Called when SolidWorks is idle
@@ -108,42 +108,42 @@ public interface ISolidWorksApplication : IDisposable
     /// <summary>
     /// Create a new assembly.
     /// </summary>
-    Model CreateAssembly(string templatePath = null);
+    IModel CreateAssembly(string templatePath = null);
 
     /// <summary>
     /// Create a new drawing with a standard paper size.
     /// </summary>
-    Model CreateDrawing(swDwgPaperSizes_e paperSize, string templatePath = null);
+    IModel CreateDrawing(swDwgPaperSizes_e paperSize, string templatePath = null);
 
     /// <summary>
     /// Create a new drawing with a custom paper size.
     /// </summary>
-    Model CreateDrawing(double width, double height, string templatePath = null);
+    IModel CreateDrawing(double width, double height, string templatePath = null);
 
     /// <summary>
     /// Create a new part.
     /// </summary>
-    Model CreatePart(string templatePath = null);
+    IModel CreatePart(string templatePath = null);
 
     /// <summary>
     /// Loops all open documents returning a safe Model for each document.
     /// </summary>
-    IEnumerable<Model> OpenDocuments();
+    IEnumerable<IModel> OpenDocuments();
 
     /// <summary>
     /// Open a part, assembly or drawing by its file path.
     /// </summary>
-    Model OpenFile(string filePath, OpenDocumentOptions options = OpenDocumentOptions.None, string configuration = null);
+    IModel OpenFile(string filePath, OpenDocumentOptions options = OpenDocumentOptions.None, string configuration = null);
 
     /// <summary>
     /// Open a part, assembly or drawing and fully control how the file is opened.
     /// </summary>
-    Model OpenFile(IDocumentSpecification documentSpecification);
+    IModel OpenFile(IDocumentSpecification documentSpecification);
 
     /// <summary>
     /// Open a part, assembly or drawing by its PLM ID.
     /// </summary>
-    Model OpenFileFrom3DExperience(string plmId);
+    IModel OpenFileFrom3DExperience(string plmId);
 
     /// <summary>
     /// Closes a file

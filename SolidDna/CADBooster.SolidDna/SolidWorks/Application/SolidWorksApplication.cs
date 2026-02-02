@@ -26,7 +26,7 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
     /// <summary>
     /// The currently active document
     /// </summary>
-    protected Model mActiveModel;
+    protected IModel mActiveModel;
 
     #endregion
 
@@ -50,7 +50,7 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
     /// <summary>
     /// The currently active model
     /// </summary>
-    public Model ActiveModel => mActiveModel;
+    public IModel ActiveModel => mActiveModel;
 
     /// <summary>
     /// The type of SolidWorks application that is currently running.
@@ -97,22 +97,22 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
     /// <summary>
     /// Called when the currently active file has been saved
     /// </summary>
-    public event Action<string, Model> ActiveFileSaved = (path, model) => { };
+    public event Action<string, IModel> ActiveFileSaved = (path, model) => { };
 
     /// <summary>
     /// Called when any information about the currently active model has changed
     /// </summary>
-    public event Action<Model> ActiveModelInformationChanged = (model) => { };
+    public event Action<IModel> ActiveModelInformationChanged = (model) => { };
 
     /// <summary>
     /// Called when a new file has been created
     /// </summary>
-    public event Action<Model> FileCreated = (model) => { };
+    public event Action<IModel> FileCreated = (model) => { };
 
     /// <summary>
     /// Called when a file has been opened
     /// </summary>
-    public event Action<string, Model> FileOpened = (path, model) => { };
+    public event Action<string, IModel> FileOpened = (path, model) => { };
 
     /// <summary>
     /// Called when SolidWorks is idle
@@ -456,7 +456,7 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
     /// </summary>
     /// <param name="templatePath">Your preferred assembly template path. Pass null to use the default assembly template.</param>
     /// <returns></returns>
-    public Model CreateAssembly(string templatePath = null)
+    public IModel CreateAssembly(string templatePath = null)
     {
         // If the user did not pass a template path, we get the default template path from SolidWorks.
         if (templatePath.IsNullOrEmpty())
@@ -471,7 +471,7 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
     /// <param name="paperSize"></param>
     /// <param name="templatePath">Your preferred drawing template path. Pass null to use the default drawing template.</param>
     /// <returns></returns>
-    public Model CreateDrawing(swDwgPaperSizes_e paperSize, string templatePath = null)
+    public IModel CreateDrawing(swDwgPaperSizes_e paperSize, string templatePath = null)
     {
         // If the user did not pass a template path, we get the default template path from SolidWorks.
         if (templatePath.IsNullOrEmpty())
@@ -487,7 +487,7 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
     /// <param name="width"></param>
     /// <param name="templatePath">Your preferred drawing template path. Pass null to use the default drawing template.</param>
     /// <returns></returns>
-    public Model CreateDrawing(double width, double height, string templatePath = null)
+    public IModel CreateDrawing(double width, double height, string templatePath = null)
     {
         // If the user did not pass a template path, we get the default template path from SolidWorks.
         if (templatePath.IsNullOrEmpty())
@@ -501,7 +501,7 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
     /// </summary>
     /// <param name="templatePath">Your preferred part template path. Pass null to use the default part template.</param>
     /// <returns></returns>
-    public Model CreatePart(string templatePath = null)
+    public IModel CreatePart(string templatePath = null)
     {
         // If the user did not pass a template path, we get the default template path from SolidWorks.
         if (templatePath.IsNullOrEmpty())
@@ -518,7 +518,7 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
     /// <param name="width"></param>
     /// <param name="height"></param>
     /// <returns></returns>
-    private Model CreateFile(string templatePath, swDwgPaperSizes_e paperSize = swDwgPaperSizes_e.swDwgPaperA3size, double width = 0, double height = 0)
+    private IModel CreateFile(string templatePath, swDwgPaperSizes_e paperSize = swDwgPaperSizes_e.swDwgPaperA3size, double width = 0, double height = 0)
     {
         // Wrap any error
         return SolidDnaErrors.Wrap(() =>
@@ -538,11 +538,11 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
     #region Open/Close Models
 
     /// <summary>
-    /// Loops all open documents returning a safe <see cref="Model"/> for each document,
+    /// Loops all open documents returning a safe <see cref="IModel"/> for each document,
     /// disposing of the COM reference after its use
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<Model> OpenDocuments()
+    public IEnumerable<IModel> OpenDocuments()
     {
         // Loop each child
         foreach (ModelDoc2 modelDoc in (object[]) BaseObject.GetDocuments())
@@ -560,7 +560,7 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
     /// <param name="filePath">The path to the file</param>
     /// <param name="options">The options to use when opening the file (flags, so use pipes | to combine options)</param>
     /// <param name="configuration">The name of the configuration you want to open. If you skip this parameter, SolidWorks will open the configuration is which the model was last saved.</param>
-    public Model OpenFile(string filePath, OpenDocumentOptions options = OpenDocumentOptions.None, string configuration = null)
+    public IModel OpenFile(string filePath, OpenDocumentOptions options = OpenDocumentOptions.None, string configuration = null)
     {
         // Wrap any error
         return SolidDnaErrors.Wrap(() =>
@@ -595,7 +595,7 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
     /// Properties that are not valid when opening a file from 3DExperience: FileName, ConfigurationName,
     /// DocumentType, DisplayState, InteractiveAdvancedOpen, InteractiveComponentSelection, LoadExternalReferencesInMemory.</param>
     /// <returns></returns>
-    public Model OpenFile(IDocumentSpecification documentSpecification)
+    public IModel OpenFile(IDocumentSpecification documentSpecification)
     {
         // Wrap any error
         return SolidDnaErrors.Wrap(() =>
@@ -620,7 +620,7 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
     /// </summary>
     /// <param name="plmId">The unique ID of this model. Consists of numbers and letters, seems to be 32 characters long.</param>
     /// <returns></returns>
-    public Model OpenFileFrom3DExperience(string plmId)
+    public IModel OpenFileFrom3DExperience(string plmId)
     {
         // Get a new object specification
         var swDocSpecification = (IDocumentSpecification) BaseObject.GetOpenDocSpec("");
@@ -656,7 +656,7 @@ public partial class SolidWorksApplication : SharedSolidDnaObject<SldWorks>, ISo
 
     /// <summary>
     /// Gets an <see cref="IExportPdfData"/> object for use with a <see cref="PdfExportData"/>
-    /// object used in <see cref="Model.SaveAs(string, SaveAsVersion, SaveAsOptions, PdfExportData)"/> call
+    /// object used in <see cref="IModel.SaveAs(string, SaveAsVersion, SaveAsOptions, PdfExportData)"/> call
     /// </summary>
     /// <returns></returns>
     public IExportPdfData GetPdfExportData()

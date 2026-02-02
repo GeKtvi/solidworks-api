@@ -25,26 +25,26 @@ public class ComponentNode
 
 public static class ModelAssemblyExtensions
 {
-    public static ComponentNode GetRootComponentNode(this Model model, ICompositeDisposable compositeDisposable = null)
+    public static ComponentNode GetRootComponentNode(this IModel model, ICompositeDisposable compositeDisposable = null)
         => model.GetRootComponentNode(null, compositeDisposable);
 
-    public static ComponentNode GetRootComponentNode(this Model model, string configurationName, ICompositeDisposable compositeDisposable = null)
+    public static ComponentNode GetRootComponentNode(this IModel model, string configurationName, ICompositeDisposable compositeDisposable = null)
     {
         var component = GetRootComponentFromConfiguration(model, configurationName);
         return new ComponentNode(null, component, compositeDisposable ?? DummyCompositeDisposable.Default);
     }
 
-    public static IEnumerable<ComponentNode> GetComponentNodes(this Model model, ICompositeDisposable compositeDisposable = null)
+    public static IEnumerable<ComponentNode> GetComponentNodes(this IModel model, ICompositeDisposable compositeDisposable = null)
         => model.GetComponentNodes(null, compositeDisposable);
 
-    public static IEnumerable<ComponentNode> GetComponentNodes(this Model model, string configurationName, ICompositeDisposable compositeDisposable = null)
+    public static IEnumerable<ComponentNode> GetComponentNodes(this IModel model, string configurationName, ICompositeDisposable compositeDisposable = null)
     {
         var component = GetRootComponentFromConfiguration(model, configurationName);
 
         return new ComponentNode(null, component, compositeDisposable ?? DummyCompositeDisposable.Default).Children;
     }
 
-    public static IEnumerable<ComponentNode> GetComponentNodesRecursively(this Model model, bool includeRoot = false, ICompositeDisposable compositeDisposable = null)
+    public static IEnumerable<ComponentNode> GetComponentNodesRecursively(this IModel model, bool includeRoot = false, ICompositeDisposable compositeDisposable = null)
     {
         var root = model.GetRootComponentNode(null, compositeDisposable);
 
@@ -65,7 +65,7 @@ public static class ModelAssemblyExtensions
         }
     }
 
-    private static Component GetRootComponentFromConfiguration(Model model, string configurationName)
+    private static Component GetRootComponentFromConfiguration(IModel model, string configurationName)
     {
         var modelConfiguration = configurationName is null
             ? model.ActiveConfiguration

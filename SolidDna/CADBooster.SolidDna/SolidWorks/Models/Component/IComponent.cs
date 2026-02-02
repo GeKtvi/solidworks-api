@@ -18,7 +18,7 @@ public interface IComponent : IDisposable
     /// Get the Model from the component.
     /// Warning: this can be null if the component is suppressed or lightweight.
     /// </summary>
-    Model AsModel { get; }
+    IModel AsModel { get; }
 
     /// <summary>
     /// Get children from this Component
@@ -165,7 +165,7 @@ public interface IComponent : IDisposable
     /// Get the assembly that owns this component.
     /// </summary>
     /// <returns>The parent assembly model</returns>
-    Model GetParentAssembly();
+    IModel GetParentAssembly();
 
     #endregion
 }
