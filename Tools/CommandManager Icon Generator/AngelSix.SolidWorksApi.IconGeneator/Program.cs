@@ -1,9 +1,10 @@
-﻿using Svg;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using Svg.Skia;
 
 namespace AngelSix.SolidWorksApi.IconGeneator
 {
@@ -288,7 +289,7 @@ namespace AngelSix.SolidWorksApi.IconGeneator
         private static Bitmap CombineBitmap(List<FileInfo> files, int iconSize)
         {
             // Read all images into memory
-            Bitmap finalImage = null;
+            Bitmap? finalImage = null;
             var images = new List<Bitmap>();
 
             try
@@ -341,13 +342,37 @@ namespace AngelSix.SolidWorksApi.IconGeneator
                 images.ForEach(image => image?.Dispose());
             }
         }
+
+        /// <summary>
+        /// Converts SVG to bitmap using Svg.Skia (SkiaSharp) for better quality at low resolutions (e.g. 20x20).
+        /// Renders at exact size with scale-to-fit and center; no supersampling to avoid blur.
+        /// </summary>
         private static Bitmap ConvertSvgToBitmap(FileInfo svgFile, int size)
         {
-            // Load SVG document
-            var svgDocument = SvgDocument.Open(svgFile.FullName);
+            using var svg = new SKSvg();
+            if (svg.Load(svgFile.FullName) is null || svg.Picture is null)
+                throw new InvalidOperationException($"Failed to load SVG: {svgFile.FullName}");
 
-            // Convert to Bitmap
-            return svgDocument.Draw(size, size);
+            var picture = svg.Picture;
+            var bounds = picture.CullRect;
+            var imageInfo = new SKImageInfo(size, size, SKColorType.Rgba8888, SKAlphaType.Premul);
+            using var surface = SKSurface.Create(imageInfo);
+            var canvas = surface.Canvas;
+            canvas.Clear(SKColors.Transparent);
+
+            var scale = Math.Min((float)size / bounds.Width, (float)size / bounds.Height);
+            var dx = (size - (bounds.Width * scale)) / 2f;
+            var dy = (size - (bounds.Height * scale)) / 2f;
+            canvas.Scale(scale);
+            canvas.Translate(dx / scale, dy / scale);
+            canvas.DrawPicture(picture);
+
+            using var image = surface.Snapshot();
+            using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+            using var stream = new MemoryStream();
+            data.SaveTo(stream);
+            stream.Position = 0;
+            return new Bitmap(stream);
         }
     }
 }

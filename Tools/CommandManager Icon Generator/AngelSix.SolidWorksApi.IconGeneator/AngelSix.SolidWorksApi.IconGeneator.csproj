@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <OutputType>Exe</OutputType>
@@ -28,7 +28,7 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Svg" Version="3.4.7" />
+    <PackageReference Include="Svg.Skia" Version="3.4.1" />
   </ItemGroup>
   <ItemGroup>
     <None Update="listUpdate.svg">
