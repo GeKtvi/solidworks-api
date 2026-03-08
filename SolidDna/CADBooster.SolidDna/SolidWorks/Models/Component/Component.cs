@@ -26,8 +26,12 @@ public class Component : SolidDnaObject<Component2>, IComponent
     {
         get
         {
+            if(_model is not null)
+                return _model;
+
             var modelDoc2 = (ModelDoc2) BaseObject.GetModelDoc2();
-            return modelDoc2 == null ? null : new Model(modelDoc2);
+            _model = modelDoc2 is null ? null : new Model(modelDoc2);
+            return _model;
         }
     }
 
@@ -180,6 +184,15 @@ public class Component : SolidDnaObject<Component2>, IComponent
     /// Get the unique 32-character alphanumeric identifier for this component.
     /// </summary>
     public string PlmId => BaseObject.GetPLMID();
+
+    #endregion
+
+    #region Private Fields
+
+    /// <summary>
+    /// Stored model instance
+    /// </summary>
+    private IModel _model;
 
     #endregion
 
@@ -491,7 +504,7 @@ public class Component : SolidDnaObject<Component2>, IComponent
     public override void Dispose()
     {
         // Clean up embedded objects
-        AsModel?.Dispose();
+        _model?.Dispose();
 
         // Dispose self
         base.Dispose();

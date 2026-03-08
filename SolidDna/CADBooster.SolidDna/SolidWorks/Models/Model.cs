@@ -108,52 +108,92 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     /// <summary>
     /// Called after the active drawing sheet has changed
     /// </summary>
-    public event Action<string> DrawingActiveSheetChanged = (sheetName) => { };
+    public event Action<string> DrawingActiveSheetChanged
+    {
+        add => _drawingActiveSheetChanged.Subscribe(value);
+        remove => _drawingActiveSheetChanged.Unsubscribe(value);
+    }
 
     /// <summary>
     /// Called before the active drawing sheet changes
     /// </summary>
-    public event Action<string> DrawingActiveSheetChanging = (sheetName) => { };
+    public event Action<string> DrawingActiveSheetChanging
+    {
+        add => _drawingActiveSheetChanging.Subscribe(value);
+        remove => _drawingActiveSheetChanging.Unsubscribe(value);
+    }
 
     /// <summary>
     /// Called after a drawing sheet was added
     /// </summary>
-    public event Action<string> DrawingSheetAdded = (sheetName) => { };
+    public event Action<string> DrawingSheetAdded
+    {
+        add => _drawingSheetAdded.Subscribe(value);
+        remove => _drawingSheetAdded.Unsubscribe(value);
+    }
 
     /// <summary>
     /// Called after a drawing sheet was deleted
     /// </summary>
-    public event Action<string> DrawingSheetDeleted = (sheetName) => { };
+    public event Action<string> DrawingSheetDeleted
+    {
+        add => _drawingSheetDeleted.Subscribe(value);
+        remove => _drawingSheetDeleted.Unsubscribe(value);
+    }
 
     /// <summary>
     /// Called when selected objects are about to be deleted.
     /// </summary>
-    public event Action DeletingSelection = () => { };
+    public event Action DeletingSelection
+    {
+        add => _deletingSelection.Subscribe(value);
+        remove => _deletingSelection.Unsubscribe(value);
+    }
 
     /// <summary>
     /// Called after a file is dropped into the current part/assembly.
     /// </summary>
-    public event Action<string> FileDropped = (filePath) => { };
+    public event Action<string> FileDropped
+    {
+        add => _fileDropped.Subscribe(value);
+        remove => _fileDropped.Unsubscribe(value);
+    }
 
     /// <summary>
     /// Called when a file is about to be dropped into the current part/assembly.
     /// </summary>
-    public event Action<string> FileDropping = (filePath) => { };
+    public event Action<string> FileDropping
+    {
+        add => _fileDropping.Subscribe(value);
+        remove => _fileDropping.Unsubscribe(value);
+    }
 
     /// <summary>
     /// Called after an item is added to the feature tree.
     /// </summary>
-    public event Action<swNotifyEntityType_e, string> ItemAdded = (entityType, itemName) => { };
+    public event Action<swNotifyEntityType_e, string> ItemAdded
+    {
+        add => _itemAdded.Subscribe(value);
+        remove => _itemAdded.Unsubscribe(value);
+    }
 
     /// <summary>
     /// Called after an item is deleted from the feature tree.
     /// </summary>
-    public event Action<swNotifyEntityType_e, string> ItemDeleted = (entityType, itemName) => { };
+    public event Action<swNotifyEntityType_e, string> ItemDeleted
+    {
+        add => _itemDeleted.Subscribe(value);
+        remove => _itemDeleted.Unsubscribe(value);
+    }
 
     /// <summary>
     /// Called when an item is about to be deleted from the feature tree.
     /// </summary>
-    public event Action<swNotifyEntityType_e, string> ItemDeleting = (entityType, itemName) => { };
+    public event Action<swNotifyEntityType_e, string> ItemDeleting
+    {
+        add => _itemDeleting.Subscribe(value);
+        remove => _itemDeleting.Unsubscribe(value);
+    }
 
     /// <summary>
     /// Called as the model is about to be closed
@@ -169,13 +209,21 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     /// Called when the model is first modified since it was last saved.
     /// SOLIDWORKS marks the file as Dirty and sets <see cref="IModelDoc2.GetSaveFlag"/>
     /// </summary>
-    public event Action ModelModified = () => { };
+    public event Action ModelModified
+    {
+        add => _modelModified.Subscribe(value);
+        remove => _modelModified.Unsubscribe(value);
+    }
 
     /// <summary>
     /// Called after a model was rebuilt (any model type) or if the rollback bar position changed (for parts and assemblies).
     /// NOTE: Does not always fire on normal rebuild (Ctrl+B) on assemblies.
     /// </summary>
-    public event Action ModelRebuilt = () => { };
+    public event Action ModelRebuilt
+    {
+        add => _modelRebuilt.Subscribe(value);
+        remove => _modelRebuilt.Unsubscribe(value);
+    }
 
     /// <summary>
     /// Called as the model has been saved
@@ -185,25 +233,62 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     /// <summary>
     /// Called when the user cancels the save action and <see cref="ModelSaved"/> will not be fired.
     /// </summary>
-    public event Action ModelSaveCanceled = () => { };
+    public event Action ModelSaveCanceled
+    {
+        add => _modelSaveCanceled.Subscribe(value);
+        remove => _modelSaveCanceled.Unsubscribe(value);
+    }
 
     /// <summary>
     /// Called before a saved model is saved again (with the same file name).
     /// Allows you to make changes that need to be included in the save. 
     /// </summary>
-    public event Action<string> ModelSaving = (fileName) => { };
+    public event Action<string> ModelSaving
+    {
+        add => _modelSaving.Subscribe(value);
+        remove => _modelSaving.Unsubscribe(value);
+    }
 
     /// <summary>
     /// Called before a model is saved with a new file name.
     /// Called before the Save As dialog is shown.
     /// Allows you to make changes that need to be included in the save. 
     /// </summary>
-    public event Action<string> ModelSavingAs = (fileName) => { };
+    public event Action<string> ModelSavingAs
+    {
+        add => _modelSavingAs.Subscribe(value);
+        remove => _modelSavingAs.Unsubscribe(value);
+    }
 
     /// <summary>
     /// Called when the selected objects in the model have changed
     /// </summary>
-    public event Action SelectionChanged = () => { };
+    public event Action SelectionChanged
+    {
+        add => _selectionChanged.Subscribe(value);
+        remove => _selectionChanged.Unsubscribe(value);
+    }
+    
+    #region Lazy Events
+
+    private LazyEvent<string> _drawingActiveSheetChanged;
+    private LazyEvent<string> _drawingActiveSheetChanging;
+    private LazyEvent<string> _drawingSheetAdded;
+    private LazyEvent<string> _drawingSheetDeleted;
+    private LazyEvent _deletingSelection;
+    private LazyEvent<string> _fileDropped;
+    private LazyEvent<string> _fileDropping;
+    private LazyEvent<swNotifyEntityType_e, string> _itemAdded;
+    private LazyEvent<swNotifyEntityType_e, string> _itemDeleted;
+    private LazyEvent<swNotifyEntityType_e, string> _itemDeleting;
+    private LazyEvent _modelModified;
+    private LazyEvent _modelRebuilt;
+    private LazyEvent _modelSaveCanceled;
+    private LazyEvent<string> _modelSaving;
+    private LazyEvent<string> _modelSavingAs;
+    private LazyEvent _selectionChanged;
+
+    #endregion
 
     #endregion
 
@@ -214,8 +299,10 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     /// </summary>
     public Model(ModelDoc2 model) : base(model)
     {
-        // Update information about this model
-        ReloadModelData();
+        if (model is not null)
+            ModelType = (ModelType) model.GetType();
+        InitializeLazyEvents();
+        ReloadModelData(true);
     }
 
     #endregion
@@ -322,56 +409,35 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
             // Hook into the save and destroy events to keep data fresh
             case ModelType.Assembly:
                 AsAssembly().ActiveConfigChangePostNotify -= ActiveConfigChangePostNotify;
-                AsAssembly().AddItemNotify -= AddItemNotify;
-                AsAssembly().DeleteItemNotify -= DeleteItemPostNotify;
-                AsAssembly().DeleteItemPreNotify -= DeleteItemPreNotify;
-                AsAssembly().DeleteSelectionPreNotify -= DeletingSelectionPreNotify;
                 AsAssembly().DestroyNotify -= FileDestroyedNotify;
-                AsAssembly().FileDropNotify -= FileDroppedPostNotify;
-                AsAssembly().FileDropPreNotify -= FileDroppedPreNotify;
-                AsAssembly().FileSaveAsNotify2 -= FileSaveAsPreNotify;
-                AsAssembly().FileSaveNotify -= FileSavePreNotify;
-                AsAssembly().FileSavePostCancelNotify -= FileSaveCanceled;
                 AsAssembly().FileSavePostNotify -= FileSavePostNotify;
-                AsAssembly().ModifyNotify -= FileModified;
-                AsAssembly().RegenPostNotify2 -= AssemblyOrPartRebuilt;
-                AsAssembly().UserSelectionPostNotify -= UserSelectionPostNotify;
-                AsAssembly().ClearSelectionsNotify -= UserSelectionPostNotify;
-                break;
+                goto default;
             case ModelType.Part:
                 AsPart().ActiveConfigChangePostNotify -= ActiveConfigChangePostNotify;
-                AsPart().AddItemNotify -= AddItemNotify;
-                AsPart().DeleteItemNotify -= DeleteItemPostNotify;
-                AsPart().DeleteItemPreNotify -= DeleteItemPreNotify;
-                AsPart().DeleteSelectionPreNotify -= DeletingSelectionPreNotify;
                 AsPart().DestroyNotify -= FileDestroyedNotify;
-                AsPart().FileDropPostNotify -= FileDroppedPostNotify;
-                AsPart().FileDropPreNotify -= FileDroppedPreNotify;
-                AsPart().FileSaveAsNotify2 -= FileSaveAsPreNotify;
-                AsPart().FileSaveNotify -= FileSavePreNotify;
-                AsPart().FileSavePostCancelNotify -= FileSaveCanceled;
                 AsPart().FileSavePostNotify -= FileSavePostNotify;
-                AsPart().ModifyNotify -= FileModified;
-                AsPart().RegenPostNotify2 -= AssemblyOrPartRebuilt;
-                AsPart().UserSelectionPostNotify -= UserSelectionPostNotify;
-                AsPart().ClearSelectionsNotify -= UserSelectionPostNotify;
-                break;
+                goto default;
             case ModelType.Drawing:
-                AsDrawing().ActivateSheetPostNotify -= SheetActivatePostNotify;
-                AsDrawing().ActivateSheetPreNotify -= SheetActivatePreNotify;
-                AsDrawing().AddItemNotify -= DrawingItemAddNotify;
-                AsDrawing().DeleteItemPreNotify -= DeleteItemPreNotify;
-                AsDrawing().DeleteItemNotify -= DeleteDrawingItemPostNotify;
-                AsDrawing().DeleteSelectionPreNotify -= DeletingSelectionPreNotify;
                 AsDrawing().DestroyNotify -= FileDestroyedNotify;
-                AsDrawing().FileSaveAsNotify2 -= FileSaveAsPreNotify;
-                AsDrawing().FileSaveNotify -= FileSavePreNotify;
-                AsDrawing().FileSavePostCancelNotify -= FileSaveCanceled;
                 AsDrawing().FileSavePostNotify -= FileSavePostNotify;
-                AsDrawing().ModifyNotify -= FileModified;
-                AsDrawing().RegenPostNotify -= DrawingRebuilt;
-                AsDrawing().UserSelectionPostNotify -= UserSelectionPostNotify;
-                AsDrawing().ClearSelectionsNotify -= UserSelectionPostNotify;
+                _drawingActiveSheetChanged.ForceUnsubscribe();
+                _drawingActiveSheetChanging.ForceUnsubscribe();
+                _drawingSheetAdded.ForceUnsubscribe();
+                _drawingSheetDeleted.ForceUnsubscribe();
+                goto default;
+            default:
+                _deletingSelection.ForceUnsubscribe();
+                _fileDropped.ForceUnsubscribe();
+                _fileDropping.ForceUnsubscribe();
+                _itemAdded.ForceUnsubscribe();
+                _itemDeleted.ForceUnsubscribe();
+                _itemDeleting.ForceUnsubscribe();
+                _modelModified.ForceUnsubscribe();
+                _modelRebuilt.ForceUnsubscribe();
+                _modelSaveCanceled.ForceUnsubscribe();
+                _modelSaving.ForceUnsubscribe();
+                _modelSavingAs.ForceUnsubscribe();
+                _selectionChanged.ForceUnsubscribe();
                 break;
         }
     }
@@ -379,10 +445,12 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     /// <summary>
     /// Reloads all variables and data about this model
     /// </summary>
-    protected void ReloadModelData()
+    protected void ReloadModelData(bool initialization = false)
     {
-        // Clean up any previous data and unhook event handlers
-        DisposeAllReferences();
+        // Clean up any previous data and unhook event handlers (Dispose disposes LazyEvents)
+        // No dispose needed on initialization 
+        if (initialization == false)
+            DisposeAllReferences();
 
         // Can't do much if there is no document
         if (BaseObject == null)
@@ -424,65 +492,211 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     /// </summary>
     protected void SetupModelEventHandlers()
     {
-        // Based on the type of model this is...
+        // Subscribe mandatory events (model state)
         switch (ModelType)
         {
-            // Hook into the save and destroy events to keep data fresh
             case ModelType.Assembly:
                 AsAssembly().ActiveConfigChangePostNotify += ActiveConfigChangePostNotify;
-                AsAssembly().AddItemNotify += AddItemNotify;
-                AsAssembly().DeleteItemNotify += DeleteItemPostNotify;
-                AsAssembly().DeleteItemPreNotify += DeleteItemPreNotify;
-                AsAssembly().DeleteSelectionPreNotify += DeletingSelectionPreNotify;
                 AsAssembly().DestroyNotify += FileDestroyedNotify;
-                AsAssembly().FileDropNotify += FileDroppedPostNotify;
-                AsAssembly().FileDropPreNotify += FileDroppedPreNotify;
-                AsAssembly().FileSaveAsNotify2 += FileSaveAsPreNotify;
-                AsAssembly().FileSaveNotify += FileSavePreNotify;
-                AsAssembly().FileSavePostCancelNotify += FileSaveCanceled;
                 AsAssembly().FileSavePostNotify += FileSavePostNotify;
-                AsAssembly().ModifyNotify += FileModified;
-                AsAssembly().RegenPostNotify2 += AssemblyOrPartRebuilt;
-                AsAssembly().UserSelectionPostNotify += UserSelectionPostNotify;
-                AsAssembly().ClearSelectionsNotify += UserSelectionPostNotify;
                 break;
             case ModelType.Part:
                 AsPart().ActiveConfigChangePostNotify += ActiveConfigChangePostNotify;
-                AsPart().AddItemNotify += AddItemNotify;
-                AsPart().DeleteItemNotify += DeleteItemPostNotify;
-                AsPart().DeleteItemPreNotify += DeleteItemPreNotify;
-                AsPart().DeleteSelectionPreNotify += DeletingSelectionPreNotify;
                 AsPart().DestroyNotify += FileDestroyedNotify;
-                AsPart().FileDropPostNotify += FileDroppedPostNotify;
-                AsPart().FileDropPreNotify += FileDroppedPreNotify;
-                AsPart().FileSaveAsNotify2 += FileSaveAsPreNotify;
-                AsPart().FileSaveNotify += FileSavePreNotify;
-                AsPart().FileSavePostCancelNotify += FileSaveCanceled;
                 AsPart().FileSavePostNotify += FileSavePostNotify;
-                AsPart().ModifyNotify += FileModified;
-                AsPart().RegenPostNotify2 += AssemblyOrPartRebuilt;
-                AsPart().UserSelectionPostNotify += UserSelectionPostNotify;
-                AsPart().ClearSelectionsNotify += UserSelectionPostNotify;
                 break;
             case ModelType.Drawing:
-                AsDrawing().ActivateSheetPostNotify += SheetActivatePostNotify;
-                AsDrawing().ActivateSheetPreNotify += SheetActivatePreNotify;
-                AsDrawing().AddItemNotify += DrawingItemAddNotify;
-                AsDrawing().DeleteItemNotify += DeleteDrawingItemPostNotify;
-                AsDrawing().DeleteItemPreNotify += DeleteItemPreNotify;
-                AsDrawing().DeleteSelectionPreNotify += DeletingSelectionPreNotify;
                 AsDrawing().DestroyNotify += FileDestroyedNotify;
-                AsDrawing().FileSaveAsNotify2 += FileSaveAsPreNotify;
-                AsDrawing().FileSaveNotify += FileSavePreNotify;
-                AsDrawing().FileSavePostCancelNotify += FileSaveCanceled;
                 AsDrawing().FileSavePostNotify += FileSavePostNotify;
-                AsDrawing().ModifyNotify += FileModified;
-                AsDrawing().RegenPostNotify += DrawingRebuilt;
-                AsDrawing().UserSelectionPostNotify += UserSelectionPostNotify;
-                AsDrawing().ClearSelectionsNotify += UserSelectionPostNotify;
                 break;
         }
+
+        // Re-subscribe lazy events if they had subscribers before reload
+        _drawingActiveSheetChanged.ResubscribeIfNeeded();
+        _drawingActiveSheetChanging.ResubscribeIfNeeded();
+        _drawingSheetAdded.ResubscribeIfNeeded();
+        _drawingSheetDeleted.ResubscribeIfNeeded();
+        _deletingSelection.ResubscribeIfNeeded();
+        _fileDropped.ResubscribeIfNeeded();
+        _fileDropping.ResubscribeIfNeeded();
+        _itemAdded.ResubscribeIfNeeded();
+        _itemDeleted.ResubscribeIfNeeded();
+        _itemDeleting.ResubscribeIfNeeded();
+        _modelModified.ResubscribeIfNeeded();
+        _modelRebuilt.ResubscribeIfNeeded();
+        _modelSaveCanceled.ResubscribeIfNeeded();
+        _modelSaving.ResubscribeIfNeeded();
+        _modelSavingAs.ResubscribeIfNeeded();
+        _selectionChanged.ResubscribeIfNeeded();
     }
+
+    private void InitializeLazyEvents()
+    {
+        _drawingActiveSheetChanged = new LazyEvent<string>(
+            () => SwitchByDocumentType(drawing: d => d.ActivateSheetPostNotify += SheetActivatePostNotify),
+            () => SwitchByDocumentType(drawing: d => d.ActivateSheetPostNotify -= SheetActivatePostNotify));
+        _drawingActiveSheetChanging = new LazyEvent<string>(
+            () => SwitchByDocumentType(drawing: d => d.ActivateSheetPreNotify += SheetActivatePreNotify),
+            () => SwitchByDocumentType(drawing: d => d.ActivateSheetPreNotify -= SheetActivatePreNotify));
+        _drawingSheetAdded = new LazyEvent<string>(
+            () => SwitchByDocumentType(drawing: d => d.AddItemNotify += DrawingItemAddNotify),
+            () => SwitchByDocumentType(drawing: d => d.AddItemNotify -= DrawingItemAddNotify));
+        _drawingSheetDeleted = new LazyEvent<string>(
+            () => SwitchByDocumentType(drawing: d => d.DeleteItemNotify += DeleteDrawingItemPostNotify),
+            () => SwitchByDocumentType(drawing: d => d.DeleteItemNotify -= DeleteDrawingItemPostNotify));
+        _deletingSelection = new LazyEvent(SubscribeToDeleteSelection, UnsubscribeFromDeleteSelection);
+        _fileDropped = new LazyEvent<string>(SubscribeToFileDrop, UnsubscribeFromFileDrop);
+        _fileDropping = new LazyEvent<string>(SubscribeToFileDropPre, UnsubscribeFromFileDropPre);
+        _itemAdded = new LazyEvent<swNotifyEntityType_e, string>(SubscribeToAddItem, UnsubscribeFromAddItem);
+        _itemDeleted = new LazyEvent<swNotifyEntityType_e, string>(SubscribeToDeleteItem, UnsubscribeFromDeleteItem);
+        _itemDeleting = new LazyEvent<swNotifyEntityType_e, string>(SubscribeToDeleteItemPre, UnsubscribeFromDeleteItemPre);
+        _modelModified = new LazyEvent(SubscribeToModify, UnsubscribeFromModify);
+        _modelRebuilt = new LazyEvent(SubscribeToRegen, UnsubscribeFromRegen);
+        _modelSaveCanceled = new LazyEvent(SubscribeToFileSaveCancel, UnsubscribeFromFileSaveCancel);
+        _modelSaving = new LazyEvent<string>(SubscribeToFileSave, UnsubscribeFromFileSave);
+        _modelSavingAs = new LazyEvent<string>(SubscribeToFileSaveAs, UnsubscribeFromFileSaveAs);
+        _selectionChanged = new LazyEvent(SubscribeToSelection, UnsubscribeFromSelection);
+    }
+
+    private void SubscribeToAddItem() 
+        => SwitchByDocumentType(
+            assembly: a => a.AddItemNotify += AddItemNotify,
+            drawing: d => d.AddItemNotify += DrawingItemAddNotify,
+            part: p => p.AddItemNotify += AddItemNotify);
+
+    private void UnsubscribeFromAddItem()
+        => SwitchByDocumentType(
+            assembly: a => a.AddItemNotify -= AddItemNotify,
+            drawing: d => d.AddItemNotify -= DrawingItemAddNotify,
+            part: p => p.AddItemNotify -= AddItemNotify);
+
+    private void SubscribeToDeleteItem()
+        => SwitchByDocumentType(
+            assembly: a => a.DeleteItemNotify += DeleteItemPostNotify,
+            drawing: d => d.DeleteItemNotify += DeleteDrawingItemPostNotify,
+            part: p => p.DeleteItemNotify += DeleteItemPostNotify);
+
+    private void UnsubscribeFromDeleteItem()
+        => SwitchByDocumentType(
+            assembly: a => a.DeleteItemNotify -= DeleteItemPostNotify,
+            drawing: d => d.DeleteItemNotify -= DeleteDrawingItemPostNotify,
+            part: p => p.DeleteItemNotify -= DeleteItemPostNotify);
+
+    private void SubscribeToDeleteItemPre()
+        => SwitchByDocumentType(
+            assembly: a => a.DeleteItemPreNotify += DeleteItemPreNotify,
+            drawing: d => d.DeleteItemPreNotify += DeleteItemPreNotify,
+            part: p => p.DeleteItemPreNotify += DeleteItemPreNotify);
+
+    private void UnsubscribeFromDeleteItemPre()
+        => SwitchByDocumentType(
+            assembly: a => a.DeleteItemPreNotify -= DeleteItemPreNotify,
+            drawing: d => d.DeleteItemPreNotify -= DeleteItemPreNotify,
+            part: p => p.DeleteItemPreNotify -= DeleteItemPreNotify);
+
+    private void SubscribeToDeleteSelection()
+        => SwitchByDocumentType(
+            assembly: a => a.DeleteSelectionPreNotify += DeletingSelectionPreNotify,
+            drawing: d => d.DeleteSelectionPreNotify += DeletingSelectionPreNotify,
+            part: p => p.DeleteSelectionPreNotify += DeletingSelectionPreNotify);
+
+    private void UnsubscribeFromDeleteSelection()
+        => SwitchByDocumentType(
+            assembly: a => a.DeleteSelectionPreNotify -= DeletingSelectionPreNotify,
+            drawing: d => d.DeleteSelectionPreNotify -= DeletingSelectionPreNotify,
+            part: p => p.DeleteSelectionPreNotify -= DeletingSelectionPreNotify);
+
+    private void SubscribeToFileDrop()
+        => SwitchByDocumentType(
+            assembly: a => a.FileDropNotify += FileDroppedPostNotify,
+            part: p => p.FileDropPostNotify += FileDroppedPostNotify);
+
+    private void UnsubscribeFromFileDrop()
+        => SwitchByDocumentType(
+            assembly: a => a.FileDropNotify -= FileDroppedPostNotify,
+            part: p => p.FileDropPostNotify -= FileDroppedPostNotify);
+
+    private void SubscribeToFileDropPre()
+        => SwitchByDocumentType(
+            assembly: a => a.FileDropPreNotify += FileDroppedPreNotify,
+            part: p => p.FileDropPreNotify += FileDroppedPreNotify);
+
+    private void UnsubscribeFromFileDropPre()
+        => SwitchByDocumentType(
+            assembly: a => a.FileDropPreNotify -= FileDroppedPreNotify,
+            part: p => p.FileDropPreNotify -= FileDroppedPreNotify);
+
+    private void SubscribeToFileSave()
+        => SwitchByDocumentType(
+            assembly: a => a.FileSaveNotify += FileSavePreNotify,
+            drawing: d => d.FileSaveNotify += FileSavePreNotify,
+            part: p => p.FileSaveNotify += FileSavePreNotify);
+
+    private void UnsubscribeFromFileSave()
+        => SwitchByDocumentType(
+            assembly: a => a.FileSaveNotify -= FileSavePreNotify,
+            drawing: d => d.FileSaveNotify -= FileSavePreNotify,
+            part: p => p.FileSaveNotify -= FileSavePreNotify);
+
+    private void SubscribeToFileSaveAs()
+        => SwitchByDocumentType(
+            assembly: a => a.FileSaveAsNotify2 += FileSaveAsPreNotify,
+            drawing: d => d.FileSaveAsNotify2 += FileSaveAsPreNotify,
+            part: p => p.FileSaveAsNotify2 += FileSaveAsPreNotify);
+
+    private void UnsubscribeFromFileSaveAs()
+        => SwitchByDocumentType(
+            assembly: a => a.FileSaveAsNotify2 -= FileSaveAsPreNotify,
+            drawing: d => d.FileSaveAsNotify2 -= FileSaveAsPreNotify,
+            part: p => p.FileSaveAsNotify2 -= FileSaveAsPreNotify);
+
+    private void SubscribeToFileSaveCancel()
+        => SwitchByDocumentType(
+            assembly: a => a.FileSavePostCancelNotify += FileSaveCanceled,
+            drawing: d => d.FileSavePostCancelNotify += FileSaveCanceled,
+            part: p => p.FileSavePostCancelNotify += FileSaveCanceled);
+
+    private void UnsubscribeFromFileSaveCancel()
+        => SwitchByDocumentType(
+            assembly: a => a.FileSavePostCancelNotify -= FileSaveCanceled,
+            drawing: d => d.FileSavePostCancelNotify -= FileSaveCanceled,
+            part: p => p.FileSavePostCancelNotify -= FileSaveCanceled);
+
+    private void SubscribeToModify()
+        => SwitchByDocumentType(
+            assembly: a => a.ModifyNotify += FileModified,
+            drawing: d => d.ModifyNotify += FileModified,
+            part: p => p.ModifyNotify += FileModified);
+
+    private void UnsubscribeFromModify()
+        => SwitchByDocumentType(
+            assembly: a => a.ModifyNotify -= FileModified,
+            drawing: d => d.ModifyNotify -= FileModified,
+            part: p => p.ModifyNotify -= FileModified);
+
+    private void SubscribeToRegen()
+        => SwitchByDocumentType(
+            assembly: a => a.RegenPostNotify2 += AssemblyOrPartRebuilt,
+            drawing: d => d.RegenPostNotify += DrawingRebuilt,
+            part: p => p.RegenPostNotify2 += AssemblyOrPartRebuilt);
+
+    private void UnsubscribeFromRegen()
+        => SwitchByDocumentType(
+            assembly: a => a.RegenPostNotify2 -= AssemblyOrPartRebuilt,
+            drawing: d => d.RegenPostNotify -= DrawingRebuilt,
+            part: p => p.RegenPostNotify2 -= AssemblyOrPartRebuilt);
+
+    private void SubscribeToSelection()
+        => SwitchByDocumentType(
+            assembly: a => { a.UserSelectionPostNotify += UserSelectionPostNotify; a.ClearSelectionsNotify += UserSelectionPostNotify; },
+            drawing: d => { d.UserSelectionPostNotify += UserSelectionPostNotify; d.ClearSelectionsNotify += UserSelectionPostNotify; },
+            part: p => { p.UserSelectionPostNotify += UserSelectionPostNotify; p.ClearSelectionsNotify += UserSelectionPostNotify; });
+
+    private void UnsubscribeFromSelection()
+        => SwitchByDocumentType(
+            assembly: a => { a.UserSelectionPostNotify -= UserSelectionPostNotify; a.ClearSelectionsNotify -= UserSelectionPostNotify; },
+            drawing: d => { d.UserSelectionPostNotify -= UserSelectionPostNotify; d.ClearSelectionsNotify -= UserSelectionPostNotify; },
+            part: p => { p.UserSelectionPostNotify -= UserSelectionPostNotify; p.ClearSelectionsNotify -= UserSelectionPostNotify; });
 
     #endregion
 
@@ -514,7 +728,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     protected int AddItemNotify(int entityType, string itemName)
     {
         // Inform listeners
-        ItemAdded((swNotifyEntityType_e) entityType, itemName);
+        _itemAdded.Invoke((swNotifyEntityType_e) entityType, itemName);
 
         // NOTE: 0 is success, anything else is an error
         return 0;
@@ -528,7 +742,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     protected int AssemblyOrPartRebuilt(object firstFeatureBelowRollbackBar)
     {
         // Inform listeners
-        ModelRebuilt();
+        _modelRebuilt.Invoke();
 
         // NOTE: 0 is success, anything else is an error
         return 0;
@@ -543,7 +757,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     private int DeleteItemPostNotify(int entityType, string itemName)
     {
         // Inform listeners
-        ItemDeleted((swNotifyEntityType_e) entityType, itemName);
+        _itemDeleted.Invoke((swNotifyEntityType_e) entityType, itemName);
 
         // NOTE: 0 is success, anything else is an error
         return 0;
@@ -558,7 +772,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     private int DeleteItemPreNotify(int entityType, string itemName)
     {
         // Inform listeners
-        ItemDeleting((swNotifyEntityType_e) entityType, itemName);
+        _itemDeleting.Invoke((swNotifyEntityType_e) entityType, itemName);
 
         // NOTE: 0 is success, anything else is an error
         return 0;
@@ -571,7 +785,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     private int DeletingSelectionPreNotify()
     {
         // Inform listeners
-        DeletingSelection();
+        _deletingSelection.Invoke();
 
         // NOTE: 0 is success, anything else is an error
         return 0;
@@ -615,7 +829,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
         if (EntityIsDrawingSheet(entityType))
         {
             // Inform listeners
-            DrawingSheetDeleted(itemName);
+            _drawingSheetDeleted.Invoke(itemName);
         }
 
         // NOTE: 0 is success, anything else is an error
@@ -629,7 +843,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     protected int DrawingRebuilt()
     {
         // Inform listeners
-        ModelRebuilt();
+        _modelRebuilt.Invoke();
 
         // NOTE: 0 is success, anything else is an error
         return 0;
@@ -644,7 +858,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     private int FileDroppedPostNotify(string filename)
     {
         // Inform listeners
-        FileDropped(filename);
+        _fileDropped.Invoke(filename);
 
         // NOTE: 0 is success, anything else is an error
         return 0;
@@ -659,7 +873,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     private int FileDroppedPreNotify(string filename)
     {
         // Inform listeners
-        FileDropping(filename);
+        _fileDropping.Invoke(filename);
 
         // NOTE: 0 is success, anything else is an error
         return 0;
@@ -672,7 +886,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     protected int UserSelectionPostNotify()
     {
         // Inform Listeners
-        SelectionChanged();
+        _selectionChanged.Invoke();
 
         return 0;
     }
@@ -684,7 +898,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     private int FileSaveCanceled()
     {
         // Inform listeners
-        ModelSaveCanceled();
+        _modelSaveCanceled.Invoke();
 
         // NOTE: 0 is success, anything else is an error
         return 0;
@@ -741,7 +955,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     private int FileSavePreNotify(string fileName)
     {
         // Inform listeners
-        ModelSaving(fileName);
+        _modelSaving.Invoke(fileName);
 
         // NOTE: 0 is success, anything else is an error
         return 0;
@@ -756,7 +970,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     private int FileSaveAsPreNotify(string fileName)
     {
         // Inform listeners
-        ModelSavingAs(fileName);
+        _modelSavingAs.Invoke(fileName);
 
         // NOTE: 0 is success, anything else is an error
         return 0;
@@ -790,7 +1004,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     protected int FileModified()
     {
         // Inform listeners
-        ModelModified();
+        _modelModified.Invoke();
 
         // NOTE: 0 is success, anything else is an error
         return 0;
@@ -804,7 +1018,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     protected int SheetActivatePostNotify(string sheetName)
     {
         // Inform listeners
-        DrawingActiveSheetChanged(sheetName);
+        _drawingActiveSheetChanged.Invoke(sheetName);
 
         // NOTE: 0 is success, anything else is an error
         return 0;
@@ -816,7 +1030,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     protected int SheetActivatePreNotify(string sheetName)
     {
         // Inform listeners
-        DrawingActiveSheetChanging(sheetName);
+        _drawingActiveSheetChanging.Invoke(sheetName);
 
         // NOTE: 0 is success, anything else is an error
         return 0;
@@ -830,7 +1044,7 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     protected int SheetAddedNotify(string sheetName)
     {
         // Inform listeners
-        DrawingSheetAdded(sheetName);
+        _drawingSheetAdded.Invoke(sheetName);
 
         // NOTE: 0 is success, anything else is an error
         return 0;
@@ -860,6 +1074,32 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     /// </summary>
     /// <returns></returns>
     public DrawingDoc AsDrawing() => (DrawingDoc) BaseObject;
+
+    /// <summary>
+    /// Switches by document type and invokes the matching action.
+    /// </summary>
+    private void SwitchByDocumentType(
+        Action<AssemblyDoc> assembly = null,
+        Action<DrawingDoc> drawing = null,
+        Action<PartDoc> part = null,
+        Action noDocument = null)
+    {
+        switch (ModelType)
+        {
+            case ModelType.Assembly when AsAssembly() is not null:
+                assembly?.Invoke(AsAssembly());
+                break;
+            case ModelType.Drawing when AsDrawing() is not null:
+                drawing?.Invoke(AsDrawing());
+                break;
+            case ModelType.Part when AsPart() is not null:
+                part?.Invoke(AsPart());
+                break;
+            default:
+                noDocument?.Invoke();
+                break;
+        }
+    }
 
     /// <summary>
     /// Accesses the current model as a drawing to expose all Drawing API calls.
