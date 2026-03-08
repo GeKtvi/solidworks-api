@@ -1,4 +1,4 @@
-﻿using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System;
 using System.Collections.Generic;
@@ -117,6 +117,12 @@ public class Component : SolidDnaObject<Component2>, IComponent
     public bool IsSuppressed => BaseObject.IsSuppressed();
 
     /// <summary>
+    /// Gets whether the component is in lightweight state.
+    /// </summary>
+    public bool IsLightweight =>
+        (swComponentSuppressionState_e)BaseObject.GetSuppression2() == swComponentSuppressionState_e.swComponentLightweight;
+
+    /// <summary>
     /// Check if the component is a virtual component.
     /// Virtual components are saved within the assembly, not to a separate file.
     /// </summary>
@@ -136,7 +142,7 @@ public class Component : SolidDnaObject<Component2>, IComponent
     /// <summary>
     /// Get the type of component, either a part or an assembly.
     /// </summary>
-    public ComponentTypes ModelType => FilePath.ToLower().EndsWith(".sldprt")
+    public ComponentTypes ModelType => FilePath.EndsWith(".sldprt", StringComparison.OrdinalIgnoreCase)
         ? ComponentTypes.Part
         : ComponentTypes.Assembly;
 
@@ -203,6 +209,27 @@ public class Component : SolidDnaObject<Component2>, IComponent
     /// </summary>
     public Component(Component2 component) : base(component)
     {
+    }
+
+    #endregion
+
+    #region Custom properties
+
+    /// <summary>
+    /// Gets a configuration-specific custom property editor for the component.
+    /// </summary>
+    /// <param name="configurationName">Optional configuration name. Uses component's configuration when not specified.</param>
+    /// <returns>A custom property editor for the component's configuration, or <see langword="null"/> when the component is lightweight.</returns>
+    public CustomPropertyEditor GetCustomPropertyEditor(string configurationName = null)
+    {
+        configurationName ??= ConfigurationName;
+
+        var manager = BaseObject.CustomPropertyManager[configurationName];
+
+        if (manager is null)
+            return null;
+
+        return new CustomPropertyEditor((CustomPropertyManager) manager);
     }
 
     #endregion
