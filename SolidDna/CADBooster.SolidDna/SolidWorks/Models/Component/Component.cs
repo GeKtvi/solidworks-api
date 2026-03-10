@@ -3,6 +3,7 @@ using SolidWorks.Interop.swconst;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace CADBooster.SolidDna;
 
@@ -211,12 +212,42 @@ public class Component : SolidDnaObject<Component2>, IComponent
     {
         configurationName ??= ConfigurationName;
 
-        var manager = BaseObject.CustomPropertyManager[configurationName];
+        if(SolidWorksEnvironment.IApplication.SolidWorksVersion.Version < 2024)
+        {
+            ModelDoc2 model = null;
+            ModelDocExtension extension = null;
 
-        if (manager is null)
-            return null;
+            try
+            {
+                model = (ModelDoc2) BaseObject.GetModelDoc2();
+                extension = model?.Extension;
 
-        return new CustomPropertyEditor((CustomPropertyManager) manager);
+                var manager = extension?.CustomPropertyManager[configurationName];
+
+                if (manager is null)
+                    return null;
+
+                return new CustomPropertyEditor(manager);
+            }
+            finally
+            {
+                if (model is not null)
+                    Marshal.ReleaseComObject(model);
+
+                if (extension is not null)
+                    Marshal.ReleaseComObject(extension);
+            }
+        }
+        else
+        {
+            var manager = BaseObject.CustomPropertyManager[configurationName];
+
+            if (manager is null)
+                return null;
+
+            return new CustomPropertyEditor((CustomPropertyManager) manager);
+        }
+
     }
 
     #endregion
