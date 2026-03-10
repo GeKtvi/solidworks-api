@@ -211,12 +211,28 @@ public class Component : SolidDnaObject<Component2>, IComponent
     {
         configurationName ??= ConfigurationName;
 
-        var manager = BaseObject.CustomPropertyManager[configurationName];
+        if(SolidWorksEnvironment.IApplication.SolidWorksVersion.Version < 2024)
+        {
+            using var model = new SolidDnaObject<ModelDoc2>(BaseObject.IGetModelDoc());
+            using var extension = new SolidDnaObject<ModelDocExtension>(model.UnsafeObject.Extension);
 
-        if (manager is null)
-            return null;
+            var manager = extension.UnsafeObject.CustomPropertyManager[configurationName];
 
-        return new CustomPropertyEditor((CustomPropertyManager) manager);
+            if (manager is null)
+                return null;
+
+            return new CustomPropertyEditor(manager);
+        }
+        else
+        {
+            var manager = BaseObject.CustomPropertyManager[configurationName];
+
+            if (manager is null)
+                return null;
+
+            return new CustomPropertyEditor((CustomPropertyManager) manager);
+        }
+
     }
 
     #endregion
