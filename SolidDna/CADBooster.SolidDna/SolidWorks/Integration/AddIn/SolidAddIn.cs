@@ -148,7 +148,7 @@ public abstract class SolidAddIn : ISwAddin
     public int ItemStateCheck(string callbackId)
     {
         // Log it
-        Logger.LogDebugSource($"SolidWorks {nameof(ItemStateCheck)} fired {callbackId}");
+        Logger.LogTraceSource($"SolidWorks {nameof(ItemStateCheck)} fired {callbackId}");
 
         return PlugInIntegration.OnItemStateCheck(callbackId);
     }

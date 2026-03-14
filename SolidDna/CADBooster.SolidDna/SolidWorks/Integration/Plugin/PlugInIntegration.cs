@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -51,6 +51,8 @@ public class PlugInIntegration
     /// Contains the absolute file paths of all DLLs that contain at least one <see cref="SolidPlugIn"/>.
     /// </summary>
     public List<string> PlugInAssemblyPaths { get; } = [];
+
+    private readonly Stopwatch _stateCheckStopwatch = new();
 
     #endregion
 
@@ -166,12 +168,19 @@ public class PlugInIntegration
             // Create a new arguments object so we can return a value from only the relevant command manager item or flyout.
             var args = new CommandManagerItemStateCheckArgs(callbackId);
 
+            _stateCheckStopwatch.Restart();
+
             // Inform listeners
             ItemStateCheckFired(args);
 
-            if (args.Result != CommandManagerItemState.DeselectedEnabled)
-            {
-            }
+            var time = _stateCheckStopwatch.ElapsedMilliseconds;
+
+            if (time < 5)
+                Logger.LogTraceSource($"{ParentAddIn.PlugIns}: OnItemStateCheck completed in {time} ms, CallbackId: {callbackId}");
+            else if (time < 20)
+                Logger.LogDebugSource($"{ParentAddIn.PlugIns}: OnItemStateCheck completed in {time} ms, CallbackId: {callbackId}");
+            else if (time < 50)
+                Logger.LogWarningSource($"{ParentAddIn.PlugIns}: OnItemStateCheck took {time} ms (slower than recommended), CallbackId: {callbackId}");
 
             // Pass the result on to SolidWorks
             return (int) args.Result;
