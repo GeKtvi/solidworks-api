@@ -12,7 +12,7 @@ public class FileLoggerConfiguration
     /// <summary>
     /// The level of log that should be processed
     /// </summary>
-    public LogLevel LogLevel { get; set; } = LogLevel.Trace;
+    public LogLevel LogLevel { get; set; } = LogLevel.Warning;
 
     /// <summary>
     /// Whether to log the time as part of the message

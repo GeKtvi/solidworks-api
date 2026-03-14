@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace CADBooster.SolidDna;
@@ -33,6 +32,32 @@ public static class Logger
         // Set a default configuration if none is provided.
         configuration ??= new FileLoggerConfiguration();
         AddLogger<TAddIn>(new FileLogger("SolidDna", filePath, configuration));
+    }
+
+    /// <summary>
+    /// Add a console logger for all SolidDna log messages.
+    /// Is cleaned up when your add-in unloads.
+    /// </summary>
+    /// <typeparam name="TAddIn"></typeparam>
+    /// <param name="configuration"></param>
+    public static void AddConsoleLogger<TAddIn>(ConsoleLoggerConfiguration configuration = null) where TAddIn : SolidAddIn
+    {
+        // Set a default configuration if none is provided.
+        configuration ??= new ConsoleLoggerConfiguration();
+        AddLogger<TAddIn>(new ConsoleLogger("SolidDna", configuration));
+    }
+
+    /// <summary>
+    /// Add a debug logger for all SolidDna log messages.
+    /// Is cleaned up when your add-in unloads.
+    /// </summary>
+    /// <typeparam name="TAddIn"></typeparam>
+    /// <param name="configuration"></param>
+    public static void AddDebugLogger<TAddIn>(DebugLoggerConfiguration configuration = null) where TAddIn : SolidAddIn
+    {
+        // Set a default configuration if none is provided.
+        configuration ??= new DebugLoggerConfiguration();
+        AddLogger<TAddIn>(new DebugLogger("SolidDna", configuration));
     }
 
     /// <summary>
@@ -195,12 +220,6 @@ public static class Logger
     private static void LogToAllLoggers(LogLevel logLevel, string message, EventId eventId, Exception exception,
         string origin, string filePath, int lineNumber, object[] args)
     {
-        // Write to debugger (only in Debug mode) and the console for easier debugging
-        var completeMessage = $"{logLevel}: {message}";
-        Debug.WriteLine(completeMessage);
-        Console.WriteLine(completeMessage);
-
-        // Write to all other loggers
         foreach (var loggers in Loggers.Values)
         foreach (var logger in loggers)
             logger.Log(logLevel, eventId, args.Prepend(origin, filePath, lineNumber, message), exception, LoggerSourceFormatter.Format);
