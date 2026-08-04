@@ -24,12 +24,12 @@ public class ModelFeature : SharedSolidDnaObject<Feature>, IModelFeature
     /// <summary>
     /// The specific feature for this feature, if any
     /// </summary>
-    protected SolidDnaObject<object> mSpecificFeature;
+    protected Lazy<SolidDnaObject<object>> mSpecificFeature;
 
     /// <summary>
     /// The feature data for this feature, if any
     /// </summary>
-    protected SolidDnaObject<object> mFeatureData;
+    protected Lazy<SolidDnaObject<object>> mFeatureData;
 
     #endregion
 
@@ -60,13 +60,13 @@ public class ModelFeature : SharedSolidDnaObject<Feature>, IModelFeature
     /// The specific feature for this feature, if any.
     /// NOTE: This is a COM object. Set all instance variables of this to null once done if you set any
     /// </summary>
-    public object SpecificFeature => mSpecificFeature?.UnsafeObject;
+    public object SpecificFeature => mSpecificFeature?.Value?.UnsafeObject;
 
     /// <summary>
     /// The feature data for this feature, if any.
     /// NOTE: This is a COM object. Set all instance variables of this to null once done if you set any
     /// </summary>
-    public object FeatureData => mFeatureData?.UnsafeObject;
+    public object FeatureData => mFeatureData?.Value?.UnsafeObject;
 
     #region Type Checks
 
@@ -924,11 +924,9 @@ public class ModelFeature : SharedSolidDnaObject<Feature>, IModelFeature
     /// </summary>
     public ModelFeature(Feature model) : base(model)
     {
-        // Get the specific feature
-        mSpecificFeature = new SolidDnaObject<object>(model?.GetSpecificFeature2());
-
-        // Get the definition
-        mFeatureData = new SolidDnaObject<object>(model?.GetDefinition());
+        // Lazily get the specific feature / definition — type checks only need GetTypeName2
+        mSpecificFeature = new Lazy<SolidDnaObject<object>>(() => new SolidDnaObject<object>(BaseObject?.GetSpecificFeature2()));
+        mFeatureData = new Lazy<SolidDnaObject<object>>(() => new SolidDnaObject<object>(BaseObject?.GetDefinition()));
     }
 
     #endregion
@@ -1101,11 +1099,13 @@ public class ModelFeature : SharedSolidDnaObject<Feature>, IModelFeature
     /// </summary>
     public override void Dispose()
     {
-        // Clean up feature and data
-        mSpecificFeature?.Dispose();
+        // Clean up feature and data only if they were created
+        if (mSpecificFeature?.IsValueCreated == true)
+            mSpecificFeature.Value?.Dispose();
         mSpecificFeature = null;
 
-        mFeatureData?.Dispose();
+        if (mFeatureData?.IsValueCreated == true)
+            mFeatureData.Value?.Dispose();
         mFeatureData = null;
 
         base.Dispose();

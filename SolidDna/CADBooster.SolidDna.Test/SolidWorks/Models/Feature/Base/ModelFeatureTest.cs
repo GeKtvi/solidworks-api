@@ -17,6 +17,18 @@ internal class ModelFeatureTest
     }
 
     [Test]
+    public void Constructor_DoesNotCallSpecificFeatureOrDefinition()
+    {
+        var feature = new Mock<Feature>(MockBehavior.Strict);
+
+        var modelFeature = new ModelFeature(feature.Object);
+
+        Assert.That(modelFeature.UnsafeObject, Is.EqualTo(feature.Object));
+        feature.Verify(x => x.GetSpecificFeature2(), Times.Never);
+        feature.Verify(x => x.GetDefinition(), Times.Never);
+    }
+
+    [Test]
     public void CreateOrNull_FromFeature_SetsProperties()
     {
         var feature = new Mock<Feature>(MockBehavior.Strict);
@@ -33,5 +45,7 @@ internal class ModelFeatureTest
         Assert.That(modelFeature.FeatureData, Is.EqualTo(featureData.Object));
         Assert.That(modelFeature.SpecificFeature, Is.Not.Null);
         Assert.That(modelFeature.SpecificFeature, Is.EqualTo(specificFeature.Object));
+        feature.Verify(x => x.GetSpecificFeature2(), Times.Once);
+        feature.Verify(x => x.GetDefinition(), Times.Once);
     }
 }
