@@ -231,6 +231,11 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
     public event Action ModelSaved = () => { };
 
     /// <summary>
+    /// Called as the model has been saved with Save As, Save As Copy, or Save As Copy and Open.
+    /// </summary>
+    public event Action<FileSaveAsTypes, string> ModelSavedAs = (FileSaveAsTypes t, string p) => { };
+
+    /// <summary>
     /// Called when the user cancels the save action and <see cref="ModelSaved"/> will not be fired.
     /// </summary>
     public event Action ModelSaveCanceled
@@ -644,7 +649,8 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
             drawing: d => d.FileSaveAsNotify2 += FileSaveAsPreNotify,
             part: p => p.FileSaveAsNotify2 += FileSaveAsPreNotify);
 
-    private void UnsubscribeFromFileSaveAs()
+    private void UnsubscribeFromFileSaveAs
+        ()
         => SwitchByDocumentType(
             assembly: a => a.FileSaveAsNotify2 -= FileSaveAsPreNotify,
             drawing: d => d.FileSaveAsNotify2 -= FileSaveAsPreNotify,
@@ -920,6 +926,11 @@ public class Model : SharedSolidDnaObject<ModelDoc2>, IModel
 
         // Inform listeners
         ModelSaved();
+
+        // If type is not FileSave than it is FileSaveAs
+        // Inform SavedAs listeners
+        if (saveType != (int)swFileSaveTypes_e.swFileSave)
+            ModelSavedAs((FileSaveAsTypes) saveType, fileName);
 
         // NOTE: Due to bug in SolidWorks, saving new files refreshes the COM reference
         //       without it ever being so kind as to inform us via ANY callback in 

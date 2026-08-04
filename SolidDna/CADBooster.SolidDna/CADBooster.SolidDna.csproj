@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>3.4.1.20-gkfrk</Version>
+    <Version>3.4.1.23-gkfrk</Version>
     <Authors>Luke Malpass, Peter Brinkhuis</Authors>
     <Company>CAD Booster B.V.</Company>
     <Description>The new SolidDNA SDK, making the SolidWorks API easier, well behaved and modern</Description>

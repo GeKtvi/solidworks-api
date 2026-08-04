@@ -195,6 +195,11 @@ public interface IModel : ISolidDnaObject<ModelDoc2>
     event Action ModelSaved;
 
     /// <summary>
+    /// Called as the model has been saved with Save As, Save As Copy, or Save As Copy and Open.
+    /// </summary>
+    event Action<FileSaveAsTypes, string> ModelSavedAs;
+
+    /// <summary>
     /// Called before a saved model is saved again (with the same file name).
     /// Allows you to make changes that need to be included in the save.
     /// </summary>
