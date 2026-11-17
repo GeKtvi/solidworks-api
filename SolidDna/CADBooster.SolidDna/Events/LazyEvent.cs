@@ -12,7 +12,8 @@ namespace CADBooster.SolidDna;
 internal struct LazyEvent(Action subscribeInnerMethod, Action unsubscribeInnerMethod)
 {
     private event Action _storedUserEvents;
-    private readonly LazyEventSubscription _subscription = new(subscribeInnerMethod, unsubscribeInnerMethod);
+    // Must not be readonly: LazyEventSubscription is a mutable struct, and a readonly field would make every call run on a defensive copy
+    private LazyEventSubscription _subscription = new(subscribeInnerMethod, unsubscribeInnerMethod);
 
     /// <summary>
     /// Call when a subscriber is added. Subscribes to the source on the first subscriber.
@@ -54,7 +55,8 @@ internal struct LazyEvent(Action subscribeInnerMethod, Action unsubscribeInnerMe
 internal struct LazyEvent<T>(Action subscribeInnerMethod, Action unsubscribeInnerMethod)
 {
     private event Action<T> _storedUserEvents;
-    private readonly LazyEventSubscription _subscription = new(subscribeInnerMethod, unsubscribeInnerMethod);
+    // Must not be readonly: LazyEventSubscription is a mutable struct, and a readonly field would make every call run on a defensive copy
+    private LazyEventSubscription _subscription = new(subscribeInnerMethod, unsubscribeInnerMethod);
 
     /// <summary>
     /// Call when a subscriber is added. Subscribes to the source on the first subscriber.
@@ -95,7 +97,8 @@ internal struct LazyEvent<T>(Action subscribeInnerMethod, Action unsubscribeInne
 internal struct LazyEvent<T1, T2>(Action subscribeInnerMethod, Action unsubscribeInnerMethod)
 {
     private event Action<T1, T2> _storedUserEvents;
-    private readonly LazyEventSubscription _subscription = new(subscribeInnerMethod, unsubscribeInnerMethod);
+    // Must not be readonly: LazyEventSubscription is a mutable struct, and a readonly field would make every call run on a defensive copy
+    private LazyEventSubscription _subscription = new(subscribeInnerMethod, unsubscribeInnerMethod);
 
     public void Subscribe(Action<T1, T2> value)
     {

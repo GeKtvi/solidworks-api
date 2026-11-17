@@ -1,4 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- Signed with the library's key so the strong-named library can grant InternalsVisibleTo -->
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\CADBooster.SolidDna\StrongNameKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="Moq" Version="4.20.72" />
